@@ -3,209 +3,692 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Larkz - Innovation & Excellence</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Outils Techniques Pro</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
         * {
-            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        
-        .glow-effect {
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #a0a0a0;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 18px 50px 18px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 16px;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
-        
-        .glow-effect:hover {
-            box-shadow: 0 0 50px rgba(99, 102, 241, 0.5);
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .tab-btn {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
             transform: translateY(-2px);
         }
-        
-        .card-hover {
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            box-shadow: 0 5px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .content-section.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .card-description {
+            color: #b0b0b0;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #4ec9b0;
+            margin: 10px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid #667eea;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
             transition: all 0.3s ease;
         }
-        
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+
+        .copy-btn:hover {
+            background: #667eea;
         }
-        
-        .animate-fade-in {
-            animation: fadeIn 1s ease-in;
+
+        .tag {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 5px 5px 5px 0;
+            border: 1px solid rgba(102, 126, 234, 0.3);
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        .bg-pattern {
-            background-image: radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.1) 1px, transparent 0);
-            background-size: 40px 40px;
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+            
+            .content-section.active {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body class="bg-slate-950 text-gray-100">
-    
-    <!-- Navigation -->
-    <nav class="fixed w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Larkz</span>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Outils Techniques Pro</h1>
+            <p class="subtitle">CMD • PowerShell • Excel • Word • Office 365</p>
+        </header>
+
+        <div class="search-container">
+            <input type="text" class="search-box" id="searchInput" placeholder="Rechercher une commande ou un outil...">
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="cmd">CMD</button>
+            <button class="tab-btn" data-tab="powershell">PowerShell</button>
+            <button class="tab-btn" data-tab="excel">Excel</button>
+            <button class="tab-btn" data-tab="word">Word</button>
+            <button class="tab-btn" data-tab="office365">Office 365</button>
+        </div>
+
+        <!-- CMD Section -->
+        <div class="content-section active" id="cmd">
+            <div class="card" data-keywords="fichier dossier liste directory">
+                <h3 class="card-title">📁 Lister les fichiers et dossiers</h3>
+                <p class="card-description">Affiche tous les fichiers et dossiers du répertoire courant</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    dir /a
                 </div>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#accueil" class="text-gray-300 hover:text-indigo-400 transition">Accueil</a>
-                    <a href="#services" class="text-gray-300 hover:text-indigo-400 transition">Services</a>
-                    <a href="#projets" class="text-gray-300 hover:text-indigo-400 transition">Projets</a>
-                    <a href="#contact" class="text-gray-300 hover:text-indigo-400 transition">Contact</a>
+                <span class="tag">Navigation</span>
+            </div>
+
+            <div class="card" data-keywords="reseau ip configuration">
+                <h3 class="card-title">🌐 Configuration réseau</h3>
+                <p class="card-description">Affiche toutes les informations de configuration réseau</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    ipconfig /all
                 </div>
-                <button class="md:hidden text-gray-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
+                <span class="tag">Réseau</span>
+            </div>
+
+            <div class="card" data-keywords="ping test connexion">
+                <h3 class="card-title">📡 Tester la connexion</h3>
+                <p class="card-description">Teste la connectivité réseau vers une adresse</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    ping google.com -t
+                </div>
+                <span class="tag">Réseau</span>
+            </div>
+
+            <div class="card" data-keywords="processus tache application">
+                <h3 class="card-title">⚙️ Lister les processus</h3>
+                <p class="card-description">Affiche tous les processus en cours d'exécution</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    tasklist
+                </div>
+                <span class="tag">Système</span>
+            </div>
+
+            <div class="card" data-keywords="disk disque espace">
+                <h3 class="card-title">💾 Vérifier l'espace disque</h3>
+                <p class="card-description">Analyse et affiche l'utilisation du disque</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    chkdsk C: /f
+                </div>
+                <span class="tag">Système</span>
+            </div>
+
+            <div class="card" data-keywords="fichier systeme reparation">
+                <h3 class="card-title">🔧 Réparer les fichiers système</h3>
+                <p class="card-description">Scanne et répare les fichiers système corrompus</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    sfc /scannow
+                </div>
+                <span class="tag">Maintenance</span>
             </div>
         </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section id="accueil" class="gradient-bg bg-pattern min-h-screen flex items-center pt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 animate-fade-in">
-            <div class="text-center">
-                <h1 class="text-5xl md:text-7xl font-bold mb-6">
-                    Bienvenue sur <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Larkz</span>
-                </h1>
-                <p class="text-xl md:text-2xl text-gray-400 mb-8 max-w-3xl mx-auto">
-                    Innovation, créativité et excellence. Transformons vos idées en réalité digitale.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <a href="#contact" class="glow-effect px-8 py-4 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
-                        Commencer maintenant
-                    </a>
-                    <a href="#projets" class="px-8 py-4 border-2 border-indigo-600 text-indigo-400 rounded-lg font-semibold hover:bg-indigo-600/10 transition">
-                        Découvrir nos projets
-                    </a>
+        <!-- PowerShell Section -->
+        <div class="content-section" id="powershell">
+            <div class="card" data-keywords="service services liste">
+                <h3 class="card-title">🔄 Gérer les services</h3>
+                <p class="card-description">Liste tous les services et leur statut</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Get-Service | Sort-Object Status
                 </div>
+                <span class="tag">Administration</span>
+            </div>
+
+            <div class="card" data-keywords="processus cpu memoire">
+                <h3 class="card-title">📊 Top processus CPU</h3>
+                <p class="card-description">Affiche les 10 processus utilisant le plus de CPU</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Get-Process | Sort-Object CPU -Descending | Select-Object -First 10
+                </div>
+                <span class="tag">Performance</span>
+            </div>
+
+            <div class="card" data-keywords="fichier ancien suppression">
+                <h3 class="card-title">🗑️ Supprimer fichiers anciens</h3>
+                <p class="card-description">Supprime les fichiers de plus de 30 jours</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Get-ChildItem -Path "C:\Temp" -Recurse | Where-Object {$_.LastWriteTime -lt (Get-Date).AddDays(-30)} | Remove-Item
+                </div>
+                <span class="tag">Nettoyage</span>
+            </div>
+
+            <div class="card" data-keywords="utilisateur user compte">
+                <h3 class="card-title">👥 Lister les utilisateurs</h3>
+                <p class="card-description">Affiche tous les comptes utilisateurs locaux</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Get-LocalUser
+                </div>
+                <span class="tag">Sécurité</span>
+            </div>
+
+            <div class="card" data-keywords="update mise jour windows">
+                <h3 class="card-title">🔄 Historique des mises à jour</h3>
+                <p class="card-description">Affiche l'historique des mises à jour Windows</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Get-HotFix | Sort-Object InstalledOn -Descending
+                </div>
+                <span class="tag">Système</span>
+            </div>
+
+            <div class="card" data-keywords="export csv donnees">
+                <h3 class="card-title">📤 Exporter vers CSV</h3>
+                <p class="card-description">Exporte des données vers un fichier CSV</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Get-Process | Export-Csv -Path "C:\processes.csv" -NoTypeInformation
+                </div>
+                <span class="tag">Export</span>
             </div>
         </div>
-    </section>
 
-    <!-- Services Section -->
-    <section id="services" class="py-20 bg-slate-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4">Nos Services</h2>
-                <p class="text-gray-400 text-lg">Des solutions adaptées à vos besoins</p>
+        <!-- Excel Section -->
+        <div class="content-section" id="excel">
+            <div class="card" data-keywords="raccourci clavier rapide">
+                <h3 class="card-title">⌨️ Raccourcis essentiels</h3>
+                <p class="card-description">Raccourcis clavier les plus utiles</p>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copier</button>Ctrl + T : Créer un tableau
+Ctrl + Shift + L : Filtres
+Ctrl + ; : Date du jour
+Ctrl + Shift + ; : Heure actuelle</div>
+                <span class="tag">Productivité</span>
             </div>
+
+            <div class="card" data-keywords="formule somme calcul">
+                <h3 class="card-title">➕ Formules de base</h3>
+                <p class="card-description">Formules essentielles pour calculs</p>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copier</button>=SOMME(A1:A10)
+=MOYENNE(A1:A10)
+=SI(A1>10;"Oui";"Non")
+=RECHERCHEV(A1;B:C;2;FAUX)</div>
+                <span class="tag">Formules</span>
+            </div>
+
+            <div class="card" data-keywords="tableau croise dynamique pivot">
+                <h3 class="card-title">📊 Tableau croisé dynamique</h3>
+                <p class="card-description">Créer rapidement un tableau croisé dynamique</p>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copier</button>1. Sélectionner les données
+2. Alt + N + V
+3. Configurer les champs
+4. OK</div>
+                <span class="tag">Analyse</span>
+            </div>
+
+            <div class="card" data-keywords="format conditionnel mise en forme">
+                <h3 class="card-title">🎨 Mise en forme conditionnelle</h3>
+                <p class="card-description">Appliquer une mise en forme selon des critères</p>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copier</button>1. Sélectionner les cellules
+2. Accueil > Mise en forme conditionnelle
+3. Nouvelle règle
+4. Définir la formule ou critère</div>
+                <span class="tag">Visualisation</span>
+            </div>
+
+            <div class="card" data-keywords="macro vba automatisation">
+                <h3 class="card-title">🤖 Enregistrer une macro</h3>
+                <p class="card-description">Automatiser des tâches répétitives</p>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copier</button>1. Développeur > Enregistrer une macro
+2. Effectuer les actions
+3. Arrêter l'enregistrement
+4. Alt + F8 pour exécuter</div>
+                <span class="tag">Automatisation</span>
+            </div>
+
+            <div class="card" data-keywords="donnees validation liste">
+                <h3 class="card-title">✅ Validation de données</h3>
+                <p class="card-description">Créer des listes déroulantes</p>
+                <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copier</button>1. Sélectionner cellule(s)
+2. Données > Validation des données
+3. Liste
+4. Source : =Liste1;Liste2;Liste3</div>
+                <span class="tag">Contrôle</span>
+            </div>
+        </div>
+
+        <!-- Word Section -->
+        <div class="content-section" id="word">
+            <div class="card" data-keywords="style titre formatage">
+                <h3 class="card-title">📝 Appliquer des styles</h3>
+                <p class="card-description">Utiliser les styles pour une mise en forme cohérente</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Ctrl + Alt + 1 : Titre 1
+Ctrl + Alt + 2 : Titre 2
+Ctrl + Alt + 3 : Titre 3
+Ctrl + Shift + N : Normal
+                </div>
+                <span class="tag">Mise en forme</span>
+            </div>
+
+            <div class="card" data-keywords="table matiere sommaire">
+                <h3 class="card-title">📑 Table des matières automatique</h3>
+                <p class="card-description">Générer une table des matières basée sur les titres</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    1. Appliquer styles Titre 1, 2, 3
+2. Références > Table des matières
+3. Choisir un style
+4. F9 pour mettre à jour
+                </div>
+                <span class="tag">Navigation</span>
+            </div>
+
+            <div class="card" data-keywords="recherche remplacer">
+                <h3 class="card-title">🔍 Rechercher et remplacer</h3>
+                <p class="card-description">Rechercher et remplacer du texte avec options avancées</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Ctrl + H : Ouvrir Remplacer
+Ctrl + F : Rechercher
+Options : Respecter la casse, Mot entier
+Utiliser caractères génériques : ^p (paragraphe)
+                </div>
+                <span class="tag">Edition</span>
+            </div>
+
+            <div class="card" data-keywords="fusion publipostage mail">
+                <h3 class="card-title">✉️ Fusion et publipostage</h3>
+                <p class="card-description">Créer des documents personnalisés en masse</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    1. Publipostage > Démarrer la fusion
+2. Sélectionner les destinataires
+3. Insérer les champs de fusion
+4. Terminer et fusionner
+                </div>
+                <span class="tag">Automatisation</span>
+            </div>
+
+            <div class="card" data-keywords="commentaire revision collaboration">
+                <h3 class="card-title">💬 Suivi des modifications</h3>
+                <p class="card-description">Activer le suivi pour la collaboration</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Ctrl + Shift + E : Activer/désactiver le suivi
+Révision > Suivi des modifications
+Accepter/Rejeter les modifications
+Ajouter des commentaires : Ctrl + Alt + M
+                </div>
+                <span class="tag">Collaboration</span>
+            </div>
+
+            <div class="card" data-keywords="section saut page">
+                <h3 class="card-title">📄 Sauts de section</h3>
+                <p class="card-description">Gérer différentes mises en page dans un document</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Mise en page > Sauts de page > Sauts de section
+- Page suivante
+- Continu
+- Page paire/impaire
+Permet en-têtes/pieds différents
+                </div>
+                <span class="tag">Mise en page</span>
+            </div>
+        </div>
+
+        <!-- Office 365 Section -->
+        <div class="content-section" id="office365">
+            <div class="card" data-keywords="teams reunion video">
+                <h3 class="card-title">👥 Microsoft Teams - Raccourcis</h3>
+                <p class="card-description">Raccourcis essentiels pour Teams</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Ctrl + Shift + M : Couper/activer micro
+Ctrl + Shift + O : Activer/désactiver caméra
+Ctrl + Shift + A : Accepter un appel
+Ctrl + N : Nouvelle conversation
+                </div>
+                <span class="tag">Communication</span>
+            </div>
+
+            <div class="card" data-keywords="onedrive partage cloud">
+                <h3 class="card-title">☁️ OneDrive - Partage de fichiers</h3>
+                <p class="card-description">Partager et collaborer sur des fichiers</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    1. Clic droit sur fichier > Partager
+2. Définir les permissions (Lecture/Edition)
+3. Envoyer le lien
+4. Gérer l'accès dans "Partagé avec moi"
+                </div>
+                <span class="tag">Collaboration</span>
+            </div>
+
+            <div class="card" data-keywords="outlook email mail">
+                <h3 class="card-title">📧 Outlook - Gestion des emails</h3>
+                <p class="card-description">Organiser efficacement vos emails</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Ctrl + Shift + V : Déplacer vers dossier
+Ctrl + Q : Marquer comme lu
+Ctrl + 1/2/3... : Basculer entre Mail/Calendrier/Contacts
+Créer des règles pour tri automatique
+                </div>
+                <span class="tag">Email</span>
+            </div>
+
+            <div class="card" data-keywords="sharepoint site collaboration">
+                <h3 class="card-title">🌐 SharePoint - Bibliothèques de documents</h3>
+                <p class="card-description">Organiser les documents d'équipe</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    1. Créer des bibliothèques par projet
+2. Utiliser les métadonnées pour classification
+3. Synchroniser avec OneDrive
+4. Créer des vues personnalisées
+                </div>
+                <span class="tag">Gestion documentaire</span>
+            </div>
+
+            <div class="card" data-keywords="planner tache projet">
+                <h3 class="card-title">✅ Planner - Gestion de tâches</h3>
+                <p class="card-description">Organiser les tâches en équipe</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    1. Créer des compartiments (colonnes)
+2. Ajouter des tâches avec dates d'échéance
+3. Assigner aux membres d'équipe
+4. Utiliser les étiquettes pour catégoriser
+                </div>
+                <span class="tag">Gestion de projet</span>
+            </div>
+
+            <div class="card" data-keywords="power automate workflow automatisation">
+                <h3 class="card-title">⚡ Power Automate - Flux simples</h3>
+                <p class="card-description">Automatiser les tâches répétitives</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    Exemples de flux :
+- Sauvegarder pièces jointes Outlook vers OneDrive
+- Notifications Teams pour nouveaux emails
+- Copier fichiers entre SharePoint et OneDrive
+- Rappels automatiques pour tâches
+                </div>
+                <span class="tag">Automatisation</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.getAttribute('data-tab');
+                
+                tabBtns.forEach(b => b.classList.remove('active'));
+                contentSections.forEach(s => s.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const allCards = document.querySelectorAll('.card');
             
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="card-hover bg-slate-800 p-8 rounded-xl border border-slate-700">
-                    <div class="w-12 h-12 bg-indigo-600/20 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-2xl font-semibold mb-3">Développement Web</h3>
-                    <p class="text-gray-400">Sites web modernes, performants et responsive pour tous vos projets digitaux.</p>
-                </div>
+            allCards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const description = card.querySelector('.card-description').textContent.toLowerCase();
+                const code = card.querySelector('.code-block').textContent.toLowerCase();
+                const keywords = card.getAttribute('data-keywords') || '';
+                
+                const matches = title.includes(searchTerm) || 
+                              description.includes(searchTerm) || 
+                              code.includes(searchTerm) ||
+                              keywords.includes(searchTerm);
+                
+                card.classList.toggle('hidden', !matches);
+            });
+        });
 
-                <div class="card-hover bg-slate-800 p-8 rounded-xl border border-slate-700">
-                    <div class="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-2xl font-semibold mb-3">Design UI/UX</h3>
-                    <p class="text-gray-400">Interfaces élégantes et intuitives pour une expérience utilisateur optimale.</p>
-                </div>
-
-                <div class="card-hover bg-slate-800 p-8 rounded-xl border border-slate-700">
-                    <div class="w-12 h-12 bg-pink-600/20 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-2xl font-semibold mb-3">Stratégie Digitale</h3>
-                    <p class="text-gray-400">Accompagnement personnalisé pour développer votre présence en ligne.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projets" class="py-20 bg-slate-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4">Nos Réalisations</h2>
-                <p class="text-gray-400 text-lg">Découvrez nos derniers projets</p>
-            </div>
+        // Copy to clipboard
+        function copyCode(btn) {
+            const codeBlock = btn.parentElement;
+            const code = codeBlock.textContent.replace('Copier', '').trim();
             
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="card-hover bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
-                    <div class="h-64 bg-gradient-to-br from-indigo-600 to-purple-600"></div>
-                    <div class="p-6">
-                        <h3 class="text-2xl font-semibold mb-2">Projet Innovation</h3>
-                        <p class="text-gray-400 mb-4">Une application web révolutionnaire pour optimiser les processus métier.</p>
-                        <a href="#" class="text-indigo-400 hover:text-indigo-300 font-semibold">En savoir plus →</a>
-                    </div>
-                </div>
-
-                <div class="card-hover bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
-                    <div class="h-64 bg-gradient-to-br from-purple-600 to-pink-600"></div>
-                    <div class="p-6">
-                        <h3 class="text-2xl font-semibold mb-2">Digital Experience</h3>
-                        <p class="text-gray-400 mb-4">Refonte complète d'une plateforme e-commerce avec une UX repensée.</p>
-                        <a href="#" class="text-indigo-400 hover:text-indigo-300 font-semibold">En savoir plus →</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-slate-900">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4">Contactez-nous</h2>
-                <p class="text-gray-400 text-lg">Discutons de votre projet ensemble</p>
-            </div>
-            
-            <div class="bg-slate-800 p-8 rounded-xl border border-slate-700">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Nom</label>
-                        <input type="text" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:border-indigo-500 transition">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Email</label>
-                        <input type="email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:border-indigo-500 transition">
-                    </div>
-                </div>
-                <div class="mt-6">
-                    <label class="block text-sm font-medium mb-2">Message</label>
-                    <textarea rows="5" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:border-indigo-500 transition"></textarea>
-                </div>
-                <button class="mt-6 w-full glow-effect px-8 py-4 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
-                    Envoyer le message
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-slate-950 border-t border-slate-800 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center text-gray-400">
-                <p>&copy; 2025 Larkz. Tous droits réservés.</p>
-            </div>
-        </div>
-    </footer>
-
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copié !';
+                btn.style.background = '#4ade80';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 </html>
