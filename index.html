@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Larkz - Innovation & Excellence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .glow-effect:hover {
+            box-shadow: 0 0 50px rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bg-pattern {
+            background-image: radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.1) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-gray-100">
+    
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Larkz</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#accueil" class="text-gray-300 hover:text-indigo-400 transition">Accueil</a>
+                    <a href="#services" class="text-gray-300 hover:text-indigo-400 transition">Services</a>
+                    <a href="#projets" class="text-gray-300 hover:text-indigo-400 transition">Projets</a>
+                    <a href="#contact" class="text-gray-300 hover:text-indigo-400 transition">Contact</a>
+                </div>
+                <button class="md:hidden text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="accueil" class="gradient-bg bg-pattern min-h-screen flex items-center pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 animate-fade-in">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                    Bienvenue sur <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Larkz</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-400 mb-8 max-w-3xl mx-auto">
+                    Innovation, créativité et excellence. Transformons vos idées en réalité digitale.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="#contact" class="glow-effect px-8 py-4 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
+                        Commencer maintenant
+                    </a>
+                    <a href="#projets" class="px-8 py-4 border-2 border-indigo-600 text-indigo-400 rounded-lg font-semibold hover:bg-indigo-600/10 transition">
+                        Découvrir nos projets
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Nos Services</h2>
+                <p class="text-gray-400 text-lg">Des solutions adaptées à vos besoins</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card-hover bg-slate-800 p-8 rounded-xl border border-slate-700">
+                    <div class="w-12 h-12 bg-indigo-600/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Développement Web</h3>
+                    <p class="text-gray-400">Sites web modernes, performants et responsive pour tous vos projets digitaux.</p>
+                </div>
+
+                <div class="card-hover bg-slate-800 p-8 rounded-xl border border-slate-700">
+                    <div class="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Design UI/UX</h3>
+                    <p class="text-gray-400">Interfaces élégantes et intuitives pour une expérience utilisateur optimale.</p>
+                </div>
+
+                <div class="card-hover bg-slate-800 p-8 rounded-xl border border-slate-700">
+                    <div class="w-12 h-12 bg-pink-600/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Stratégie Digitale</h3>
+                    <p class="text-gray-400">Accompagnement personnalisé pour développer votre présence en ligne.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projets" class="py-20 bg-slate-950">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Nos Réalisations</h2>
+                <p class="text-gray-400 text-lg">Découvrez nos derniers projets</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="card-hover bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
+                    <div class="h-64 bg-gradient-to-br from-indigo-600 to-purple-600"></div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2">Projet Innovation</h3>
+                        <p class="text-gray-400 mb-4">Une application web révolutionnaire pour optimiser les processus métier.</p>
+                        <a href="#" class="text-indigo-400 hover:text-indigo-300 font-semibold">En savoir plus →</a>
+                    </div>
+                </div>
+
+                <div class="card-hover bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
+                    <div class="h-64 bg-gradient-to-br from-purple-600 to-pink-600"></div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold mb-2">Digital Experience</h3>
+                        <p class="text-gray-400 mb-4">Refonte complète d'une plateforme e-commerce avec une UX repensée.</p>
+                        <a href="#" class="text-indigo-400 hover:text-indigo-300 font-semibold">En savoir plus →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-slate-900">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Contactez-nous</h2>
+                <p class="text-gray-400 text-lg">Discutons de votre projet ensemble</p>
+            </div>
+            
+            <div class="bg-slate-800 p-8 rounded-xl border border-slate-700">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nom</label>
+                        <input type="text" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <label class="block text-sm font-medium mb-2">Message</label>
+                    <textarea rows="5" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:border-indigo-500 transition"></textarea>
+                </div>
+                <button class="mt-6 w-full glow-effect px-8 py-4 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700">
+                    Envoyer le message
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-gray-400">
+                <p>&copy; 2025 Larkz. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
