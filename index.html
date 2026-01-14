@@ -31,30 +31,34 @@
             left: 0;
             right: 0;
             height: 40px;
-            background: #1a1a2e;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
             border-top: 1px solid #367bf0;
             display: flex;
             align-items: center;
             padding: 0 10px;
             z-index: 1000;
+            box-shadow: 0 -2px 20px rgba(54, 123, 240, 0.1);
         }
 
         .app-menu {
-            background: #367bf0;
+            background: linear-gradient(135deg, #367bf0, #2868d8);
             color: white;
             padding: 8px 15px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 2px 10px rgba(54, 123, 240, 0.3);
         }
 
         .app-menu:hover {
-            background: #2868d8;
+            background: linear-gradient(135deg, #2868d8, #1a5cc7);
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(54, 123, 240, 0.5);
         }
 
         .taskbar-apps {
@@ -72,14 +76,17 @@
             transition: all 0.3s;
             color: #fff;
             font-size: 14px;
+            border: 1px solid transparent;
         }
 
         .taskbar-app:hover {
             background: rgba(54, 123, 240, 0.4);
+            border-color: rgba(54, 123, 240, 0.6);
         }
 
         .taskbar-app.active {
-            background: #367bf0;
+            background: linear-gradient(135deg, rgba(54, 123, 240, 0.6), rgba(40, 104, 216, 0.6));
+            border-color: #367bf0;
         }
 
         .system-tray {
@@ -90,13 +97,25 @@
             align-items: center;
         }
 
+        .system-tray span {
+            transition: all 0.3s;
+            padding: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .system-tray span:hover {
+            background: rgba(54, 123, 240, 0.3);
+            transform: scale(1.1);
+        }
+
         .desktop-icon {
             width: 80px;
             padding: 10px;
             text-align: center;
             color: white;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 8px;
             transition: all 0.3s;
             position: absolute;
             user-select: none;
@@ -105,16 +124,19 @@
         .desktop-icon:hover {
             background: rgba(54, 123, 240, 0.3);
             transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(54, 123, 240, 0.2);
         }
 
         .desktop-icon.selected {
             background: rgba(54, 123, 240, 0.5);
+            box-shadow: 0 0 15px rgba(54, 123, 240, 0.4);
         }
 
         .desktop-icon .icon {
             font-size: 48px;
             margin-bottom: 5px;
             animation: iconFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
         }
 
         @keyframes iconFloat {
@@ -124,25 +146,27 @@
 
         .desktop-icon .label {
             font-size: 12px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            font-weight: 500;
         }
 
         .window {
             position: absolute;
             background: #2a2a3e;
             border: 1px solid #367bf0;
-            border-radius: 8px;
+            border-radius: 10px;
             min-width: 400px;
             min-height: 300px;
             display: none;
             flex-direction: column;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            animation: windowOpen 0.3s ease-out;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+            animation: windowOpen 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
         }
 
         @keyframes windowOpen {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            from { transform: scale(0.85) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
         }
 
         .window.active {
@@ -156,17 +180,18 @@
             width: 100% !important;
             height: calc(100vh - 40px) !important;
             border-radius: 0;
+            animation: none;
         }
 
         .window-header {
-            background: #1a1a2e;
-            padding: 10px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 12px;
             border-bottom: 1px solid #367bf0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: move;
-            border-radius: 8px 8px 0 0;
+            border-radius: 10px 10px 0 0;
         }
 
         .window.maximized .window-header {
@@ -177,6 +202,9 @@
             color: white;
             font-weight: bold;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .window-controls {
@@ -185,11 +213,17 @@
         }
 
         .window-control {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: rgba(0,0,0,0.6);
         }
 
         .minimize { background: #f4c430; }
@@ -198,7 +232,12 @@
 
         .window-control:hover {
             opacity: 0.8;
-            transform: scale(1.1);
+            transform: scale(1.15);
+            color: #000;
+        }
+
+        .window-control:active {
+            transform: scale(0.95);
         }
 
         .window-content {
@@ -209,6 +248,19 @@
             background: #1e1e2e;
         }
 
+        .window-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .window-content::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+
+        .window-content::-webkit-scrollbar-thumb {
+            background: #367bf0;
+            border-radius: 4px;
+        }
+
         .terminal {
             background: #0a0a0a;
             font-family: 'Courier New', monospace;
@@ -217,19 +269,34 @@
             overflow-y: auto;
         }
 
+        .terminal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terminal::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        .terminal::-webkit-scrollbar-thumb {
+            background: #0f0;
+            border-radius: 4px;
+        }
+
         .terminal-line {
             color: #0f0;
             margin: 3px 0;
             animation: fadeIn 0.3s;
+            line-height: 1.4;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .terminal-prompt {
             color: #367bf0;
+            font-weight: bold;
         }
 
         .terminal-input {
@@ -240,6 +307,7 @@
             font-size: 14px;
             outline: none;
             width: 80%;
+            caret-color: #0f0;
         }
 
         .menu-panel {
@@ -247,49 +315,59 @@
             bottom: 45px;
             left: 10px;
             width: 350px;
-            background: #1a1a2e;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(15px);
             border: 1px solid #367bf0;
-            border-radius: 8px;
+            border-radius: 10px;
             display: none;
             padding: 15px;
             z-index: 999;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
             max-height: 500px;
             overflow-y: auto;
         }
 
         .menu-panel.active {
             display: block;
-            animation: slideUp 0.3s;
+            animation: slideUp 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
+            from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
 
         .menu-category {
             color: #367bf0;
             font-weight: bold;
-            margin: 10px 0 5px 0;
-            font-size: 12px;
+            margin: 15px 0 8px 0;
+            font-size: 11px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(54, 123, 240, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .menu-category:first-child {
+            margin-top: 0;
         }
 
         .menu-item {
-            padding: 10px;
+            padding: 12px;
             color: white;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 6px;
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            margin: 2px 0;
         }
 
         .menu-item:hover {
-            background: #367bf0;
+            background: linear-gradient(135deg, rgba(54, 123, 240, 0.6), rgba(40, 104, 216, 0.6));
             transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(54, 123, 240, 0.3);
         }
 
         .files-grid {
@@ -301,20 +379,24 @@
 
         .file-item {
             text-align: center;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 15px 10px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            border: 2px solid transparent;
         }
 
         .file-item:hover {
             background: rgba(54, 123, 240, 0.2);
-            transform: scale(1.05);
+            transform: translateY(-5px);
+            border-color: rgba(54, 123, 240, 0.5);
+            box-shadow: 0 5px 15px rgba(54, 123, 240, 0.2);
         }
 
         .file-icon {
             font-size: 48px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
 
         .text-editor {
@@ -327,6 +409,7 @@
             outline: none;
             resize: none;
             font-size: 14px;
+            line-height: 1.6;
         }
 
         .browser-bar {
@@ -335,6 +418,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            border-bottom: 1px solid #367bf0;
         }
 
         .browser-input {
@@ -343,8 +427,14 @@
             border: 1px solid #367bf0;
             color: #fff;
             padding: 8px 12px;
-            border-radius: 4px;
+            border-radius: 6px;
             outline: none;
+            transition: all 0.3s;
+        }
+
+        .browser-input:focus {
+            border-color: #50c878;
+            box-shadow: 0 0 10px rgba(80, 200, 120, 0.3);
         }
 
         .browser-content {
@@ -355,47 +445,69 @@
             overflow-y: auto;
         }
 
+        .browser-content h1 {
+            color: #367bf0;
+            margin-bottom: 15px;
+        }
+
+        .browser-content h2 {
+            color: #2868d8;
+            margin: 20px 0 10px;
+        }
+
         .system-monitor {
             padding: 15px;
         }
 
         .monitor-section {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .monitor-label {
             color: #367bf0;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .progress-bar {
             background: #2a2a3e;
-            height: 20px;
-            border-radius: 10px;
+            height: 25px;
+            border-radius: 12px;
             overflow: hidden;
             position: relative;
+            border: 1px solid rgba(54, 123, 240, 0.3);
         }
 
         .progress-fill {
             background: linear-gradient(90deg, #367bf0, #50c878);
             height: 100%;
-            transition: width 0.5s;
+            transition: width 0.5s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 12px;
+            font-weight: bold;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
         }
 
         .calc-display {
             background: #0a0a0a;
             color: #0f0;
-            padding: 20px;
+            padding: 25px;
             text-align: right;
-            font-size: 32px;
+            font-size: 36px;
             font-family: monospace;
-            border-radius: 4px;
-            margin-bottom: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 2px solid #367bf0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
 
         .calc-buttons {
@@ -405,33 +517,41 @@
         }
 
         .calc-btn {
-            background: #367bf0;
+            background: linear-gradient(135deg, #367bf0, #2868d8);
             color: white;
             padding: 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
+            font-weight: bold;
             transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(54, 123, 240, 0.3);
         }
 
         .calc-btn:hover {
-            background: #2868d8;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #2868d8, #1a5cc7);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(54, 123, 240, 0.5);
+        }
+
+        .calc-btn:active {
+            transform: translateY(0);
         }
 
         .notification {
             position: fixed;
             top: 50px;
             right: 20px;
-            background: #1a1a2e;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(15px);
             border: 1px solid #367bf0;
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 15px 20px;
             min-width: 300px;
             z-index: 2000;
-            animation: slideInRight 0.3s;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
 
         @keyframes slideInRight {
@@ -442,45 +562,56 @@
         .notif-title {
             color: #367bf0;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 15px;
         }
 
         .notif-text {
             color: #fff;
             font-size: 14px;
+            line-height: 1.4;
         }
 
         .context-menu {
             position: fixed;
-            background: #1a1a2e;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(15px);
             border: 1px solid #367bf0;
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 5px;
             display: none;
             z-index: 3000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
 
         .context-menu.active {
             display: block;
+            animation: contextAppear 0.2s ease;
+        }
+
+        @keyframes contextAppear {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
         .context-item {
-            padding: 8px 15px;
+            padding: 10px 20px;
             color: white;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 4px;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .context-item:hover {
-            background: #367bf0;
+            background: linear-gradient(135deg, rgba(54, 123, 240, 0.6), rgba(40, 104, 216, 0.6));
         }
     </style>
 </head>
 <body>
     <div class="desktop" id="desktop">
-        <!-- Icônes du bureau -->
         <div class="desktop-icon" style="top: 20px; left: 20px;" data-app="terminal">
             <div class="icon">💻</div>
             <div class="label">Terminal</div>
@@ -511,14 +642,13 @@
         </div>
     </div>
 
-    <!-- Fenêtre Terminal -->
     <div class="window" id="terminal-window" style="left: 100px; top: 100px; width: 700px; height: 450px;">
         <div class="window-header">
             <div class="window-title">🐉 Terminal - Kali Linux</div>
             <div class="window-controls">
-                <div class="window-control minimize" data-window="terminal-window"></div>
-                <div class="window-control maximize" data-window="terminal-window"></div>
-                <div class="window-control close" data-window="terminal-window"></div>
+                <div class="window-control minimize" data-window="terminal-window">−</div>
+                <div class="window-control maximize" data-window="terminal-window">□</div>
+                <div class="window-control close" data-window="terminal-window">×</div>
             </div>
         </div>
         <div class="window-content terminal" id="terminal">
@@ -529,14 +659,13 @@
         </div>
     </div>
 
-    <!-- Fenêtre Fichiers -->
     <div class="window" id="files-window" style="left: 200px; top: 150px; width: 600px; height: 400px;">
         <div class="window-header">
             <div class="window-title">📁 Gestionnaire de fichiers</div>
             <div class="window-controls">
-                <div class="window-control minimize" data-window="files-window"></div>
-                <div class="window-control maximize" data-window="files-window"></div>
-                <div class="window-control close" data-window="files-window"></div>
+                <div class="window-control minimize" data-window="files-window">−</div>
+                <div class="window-control maximize" data-window="files-window">□</div>
+                <div class="window-control close" data-window="files-window">×</div>
             </div>
         </div>
         <div class="window-content">
@@ -577,14 +706,13 @@
         </div>
     </div>
 
-    <!-- Fenêtre Outils -->
     <div class="window" id="tools-window" style="left: 300px; top: 200px; width: 500px; height: 400px;">
         <div class="window-header">
             <div class="window-title">🛠️ Outils Kali Linux</div>
             <div class="window-controls">
-                <div class="window-control minimize" data-window="tools-window"></div>
-                <div class="window-control maximize" data-window="tools-window"></div>
-                <div class="window-control close" data-window="tools-window"></div>
+                <div class="window-control minimize" data-window="tools-window">−</div>
+                <div class="window-control maximize" data-window="tools-window">□</div>
+                <div class="window-control close" data-window="tools-window">×</div>
             </div>
         </div>
         <div class="window-content">
@@ -592,29 +720,28 @@
             <div class="menu-item" onclick="runTool('metasploit')">🔓 Metasploit - Framework d'exploitation</div>
             <div class="menu-item" onclick="runTool('burpsuite')">🌐 Burp Suite - Proxy d'interception</div>
             <div class="menu-item" onclick="runTool('wireshark')">📡 Wireshark - Analyseur de paquets</div>
-            <div class="menu-item" onclick="runTool('john')">🔐 John the Ripper - Cracker de mots de passe</div>
+            <div class="menu-item" onclick="runTool('john')">🔑 John the Ripper - Cracker de mots de passe</div>
             <div class="menu-item" onclick="runTool('aircrack')">🦈 Aircrack-ng - Suite WiFi</div>
             <div class="menu-item" onclick="runTool('sqlmap')">💉 SQLMap - Injection SQL</div>
             <div class="menu-item" onclick="runTool('hydra')">💧 Hydra - Brute force</div>
         </div>
     </div>
 
-    <!-- Fenêtre Navigateur -->
     <div class="window" id="browser-window" style="left: 150px; top: 100px; width: 800px; height: 600px;">
         <div class="window-header">
             <div class="window-title">🌐 Navigateur Web</div>
             <div class="window-controls">
-                <div class="window-control minimize" data-window="browser-window"></div>
-                <div class="window-control maximize" data-window="browser-window"></div>
-                <div class="window-control close" data-window="browser-window"></div>
+                <div class="window-control minimize" data-window="browser-window">−</div>
+                <div class="window-control maximize" data-window="browser-window">□</div>
+                <div class="window-control close" data-window="browser-window">×</div>
             </div>
         </div>
         <div class="window-content" style="padding: 0;">
             <div class="browser-bar">
-                <button class="calc-btn" style="padding: 5px 10px; font-size: 14px;" onclick="history.back()">◀</button>
-                <button class="calc-btn" style="padding: 5px 10px; font-size: 14px;" onclick="history.forward()">▶</button>
+                <button class="calc-btn" style="padding: 5px 10px; font-size: 14px;">◀</button>
+                <button class="calc-btn" style="padding: 5px 10px; font-size: 14px;">▶</button>
                 <input type="text" class="browser-input" id="browser-url" value="https://www.kali.org" placeholder="Entrez une URL...">
-                <button class="calc-btn" style="padding: 5px 10px; font-size: 14px;" onclick="loadUrl()">Go</button>
+                <button class="calc-btn" style="padding: 5px 10px; font-size: 14px;">Go</button>
             </div>
             <div class="browser-content">
                 <h1>🐉 Bienvenue sur Kali Linux</h1>
@@ -630,33 +757,129 @@
         </div>
     </div>
 
-    <!-- Fenêtre Éditeur de texte -->
-    <div class="window" id="editor-window" style="left: 250px; top: 120px; width: 600px; height: 500px;">
+    <div class="window maximized" id="editor-window">
         <div class="window-header">
-            <div class="window-title">📝 Éditeur de texte</div>
+            <div class="window-title">📝 CV - Charles Arsenault</div>
             <div class="window-controls">
-                <div class="window-control minimize" data-window="editor-window"></div>
-                <div class="window-control maximize" data-window="editor-window"></div>
-                <div class="window-control close" data-window="editor-window"></div>
+                <div class="window-control minimize" data-window="editor-window">−</div>
+                <div class="window-control maximize" data-window="editor-window">□</div>
+                <div class="window-control close" data-window="editor-window">×</div>
             </div>
         </div>
         <div class="window-content" style="padding: 0;">
-            <textarea class="text-editor" placeholder="Commencez à écrire...">#!/bin/bash
-# Script Kali Linux
-echo "Bienvenue sur Kali Linux"
-echo "Système: $(uname -a)"
-echo "Utilisateur: $(whoami)"</textarea>
+            <textarea class="text-editor" placeholder="Commencez à écrire...">═══════════════════════════════════════════════════════════════════════════════
+                            CHARLES ARSENAULT
+═══════════════════════════════════════════════════════════════════════════════
+
+📞 873-661-1666
+✉️ charlesarsenault87@gmail.com
+
+═══════════════════════════════════════════════════════════════════════════════
+                              PRÉSENTATION
+═══════════════════════════════════════════════════════════════════════════════
+
+Je suis quelqu'un de passionné dans toutes les sphères que j'ai touchées dans 
+ma vie. Grand sportif depuis mon plus jeune âge, assistant capitaine de l'équipe 
+élite de l'Estrie au basketball, capitaine au soccer - ces expériences ont eu un 
+impact direct sur ma volonté d'être un chef d'équipe. Ma plus grande force est 
+la valorisation de mes confrères peu importe le domaine, la situation ou le moment.
+
+═══════════════════════════════════════════════════════════════════════════════
+                          EXPÉRIENCES PROFESSIONNELLES
+═══════════════════════════════════════════════════════════════════════════════
+
+🔧 GESTION COFFRAGES M.T. (2020 À 2024)
+───────────────────────────────────────────────────────────────────────────────
+Postes occupés:
+  • Soudeur de chantier
+  • Réparateur de matériel de construction
+  • Gestion des nouvelles employées
+  • Introduction des éléments et outils aux nouvelles employées
+
+Description des tâches:
+  • Souder différents métaux et alliages
+  • Réparé certains matériels
+  • Coupé des armatures de fer
+  • Souder des plaquettes de métal sur les Rod d'armature pour les coffrages
+
+Réalisations:
+Je considère que ma plus grande réalisation dans le domaine de la construction 
+a été de souder des radiés pour le futur complexe de luxe HUMANO à Sherbrooke 
+et ce dans un délai exceptionnel, en plus d'avoir aucune reprise nécessaire. 
+Cette performance témoigne de mon engagement envers l'excellence. J'ai également 
+eu le privilège de travailler sur des projets variés à travers tout le Québec, 
+où j'ai contribué à la réalisation de travaux impressionnants aux côtés d'une 
+équipe talentueuse et déterminée.
+
+🚧 SIGNALISATION DES CANTONS (2018 À 2019)
+───────────────────────────────────────────────────────────────────────────────
+  • Arrêter, ralentir et diriger la circulation de façon sécuritaire
+  • Protéger les travailleurs dans les zones de travaux
+  • Donner des directives et des signaux de contrôle clairs et précis
+  • Installer ou récupérer l'affichage dans et avant les zones de travaux
+
+Réalisations:
+Ma plus grande réalisation a été une journée de travail intense de 19 heures 
+sans pause. Cette expérience a renforcé mon endurance et affiné ma capacité 
+à gérer efficacement de longues journées stressantes tout en maintenant un 
+haut niveau de performance.
+
+═══════════════════════════════════════════════════════════════════════════════
+                      FORMATIONS ET PERFECTIONNEMENTS
+═══════════════════════════════════════════════════════════════════════════════
+
+🎓 Soutien informatique au CFP EXPÉ de Magog (août 2024 à aujourd'hui)
+   FIN PRÉVUE: MAI 2026
+
+📋 Certifications:
+  • SIMDUT 2020
+  • AFP soudure
+  • Pont roulant / chariot élévateur
+
+═══════════════════════════════════════════════════════════════════════════════
+                         DOMAINES D'EXPERTISES IT
+═══════════════════════════════════════════════════════════════════════════════
+
+💻 SYSTÈMES D'EXPLOITATION:
+  • Windows 10 et ultérieur
+  • Linux (Kali, Ubuntu, Debian)
+  • MacOS
+
+🖥️ MATÉRIELS:
+  • Écrans, télévision
+  • Ordinateur de bureau (PC fixe)
+  • Portable
+  • Cellulaire (Android et Apple)
+  • Imprimante
+  • Projecteur
+  • Tablette
+
+⚙️ LOGICIELS ET ENVIRONNEMENTS:
+  • Silhouette
+  • Suite Microsoft Office 365
+  • Visio
+  • Virtual Box
+  • AnyDesk, TeamViewer
+  • Norton Antivirus
+  • 7zip, Winrar, Winzip
+  • Google Chrome, Edge, Firefox
+  • Foxit Reader, Adobe
+  • WIX, GIMP
+  • Wireshark
+
+═══════════════════════════════════════════════════════════════════════════════
+                           FIN DU CURRICULUM VITAE
+═══════════════════════════════════════════════════════════════════════════════</textarea>
         </div>
     </div>
 
-    <!-- Fenêtre Moniteur Système -->
     <div class="window" id="monitor-window" style="left: 350px; top: 80px; width: 500px; height: 450px;">
         <div class="window-header">
             <div class="window-title">📊 Moniteur Système</div>
             <div class="window-controls">
-                <div class="window-control minimize" data-window="monitor-window"></div>
-                <div class="window-control maximize" data-window="monitor-window"></div>
-                <div class="window-control close" data-window="monitor-window"></div>
+                <div class="window-control minimize" data-window="monitor-window">−</div>
+                <div class="window-control maximize" data-window="monitor-window">□</div>
+                <div class="window-control close" data-window="monitor-window">×</div>
             </div>
         </div>
         <div class="window-content system-monitor">
@@ -687,14 +910,13 @@ echo "Utilisateur: $(whoami)"</textarea>
         </div>
     </div>
 
-    <!-- Fenêtre Calculatrice -->
     <div class="window" id="calc-window" style="left: 400px; top: 150px; width: 350px; height: 500px;">
         <div class="window-header">
             <div class="window-title">🔢 Calculatrice</div>
             <div class="window-controls">
-                <div class="window-control minimize" data-window="calc-window"></div>
-                <div class="window-control maximize" data-window="calc-window"></div>
-                <div class="window-control close" data-window="calc-window"></div>
+                <div class="window-control minimize" data-window="calc-window">−</div>
+                <div class="window-control maximize" data-window="calc-window">□</div>
+                <div class="window-control close" data-window="calc-window">×</div>
             </div>
         </div>
         <div class="window-content">
@@ -716,12 +938,11 @@ echo "Utilisateur: $(whoami)"</textarea>
                 <button class="calc-btn" onclick="calcInput('.')">.</button>
                 <button class="calc-btn" onclick="calcEqual()">=</button>
                 <button class="calc-btn" onclick="calcInput('+')">+</button>
-                <button class="calc-btn" onclick="calcClear()" style="grid-column: span 4; background: #ff6b6b;">C</button>
+                <button class="calc-btn" onclick="calcClear()" style="grid-column: span 4; background: linear-gradient(135deg, #ff6b6b, #ee5a52);">C</button>
             </div>
         </div>
     </div>
 
-    <!-- Menu Application -->
     <div class="menu-panel" id="app-menu">
         <div class="menu-category">⚡ Favoris</div>
         <div class="menu-item" data-app="terminal">💻 Terminal</div>
@@ -743,32 +964,29 @@ echo "Utilisateur: $(whoami)"</textarea>
         <div class="menu-item" onclick="showNotification('Extinction', 'Système en cours d\'arrêt...')">🔌 Éteindre</div>
     </div>
 
-    <!-- Menu contextuel -->
     <div class="context-menu" id="context-menu">
-        <div class="context-item" data-app="terminal">Ouvrir Terminal</div>
-        <div class="context-item" data-app="files">Ouvrir Fichiers</div>
-        <div class="context-item" onclick="showNotification('Rafraîchir', 'Bureau rafraîchi!')">Rafraîchir</div>
-        <div class="context-item" onclick="showNotification('Fond d\'écran', 'Personnalisation à venir...')">Changer le fond</div>
+        <div class="context-item" data-app="terminal">💻 Ouvrir Terminal</div>
+        <div class="context-item" data-app="files">📁 Ouvrir Fichiers</div>
+        <div class="context-item" onclick="showNotification('Rafraîchir', 'Bureau rafraîchi!')">🔄 Rafraîchir</div>
+        <div class="context-item" onclick="showNotification('Fond d\'écran', 'Personnalisation à venir...')">🖼️ Changer le fond</div>
     </div>
 
-    <!-- Barre des tâches -->
     <div class="taskbar">
         <div class="app-menu" id="menu-btn">🐉 Applications</div>
         <div class="taskbar-apps" id="taskbar-apps"></div>
         <div class="system-tray">
-            <span style="cursor: pointer;" onclick="showNotification('WiFi', 'Connecté: KaliNet')">📶</span>
-            <span style="cursor: pointer;" onclick="openWindow('monitor-window')">⚡</span>
+            <span onclick="showNotification('WiFi', 'Connecté: KaliNet')">📶</span>
+            <span onclick="showNotification('Volume', 'Volume: 75%')">🔊</span>
+            <span onclick="openWindow('monitor-window')">⚡</span>
             <span id="clock">00:00</span>
         </div>
     </div>
 
     <script>
-        // Variables globales
         let calcValue = '0';
         let calcOperation = '';
         let calcPrevious = '';
 
-        // Gestion de l'horloge
         function updateClock() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -778,7 +996,6 @@ echo "Utilisateur: $(whoami)"</textarea>
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Gestion du menu
         const menuBtn = document.getElementById('menu-btn');
         const appMenu = document.getElementById('app-menu');
         
@@ -793,7 +1010,6 @@ echo "Utilisateur: $(whoami)"</textarea>
             contextMenu.classList.remove('active');
         });
 
-        // Menu contextuel
         const contextMenu = document.getElementById('context-menu');
         const desktop = document.getElementById('desktop');
 
@@ -805,7 +1021,6 @@ echo "Utilisateur: $(whoami)"</textarea>
             appMenu.classList.remove('active');
         });
 
-        // Notifications
         function showNotification(title, text) {
             const notif = document.createElement('div');
             notif.className = 'notification';
@@ -817,7 +1032,6 @@ echo "Utilisateur: $(whoami)"</textarea>
             setTimeout(() => notif.remove(), 3000);
         }
 
-        // Gestion des fenêtres
         let zIndex = 100;
         const windowStates = {};
 
@@ -892,7 +1106,6 @@ echo "Utilisateur: $(whoami)"</textarea>
             }
         }
 
-        // Icônes du bureau
         let selectedIcon = null;
 
         document.querySelectorAll('.desktop-icon').forEach(icon => {
@@ -908,7 +1121,6 @@ echo "Utilisateur: $(whoami)"</textarea>
             });
         });
 
-        // Menu items et fichiers
         document.querySelectorAll('.menu-item[data-app], .file-item[data-app], .context-item[data-app]').forEach(item => {
             item.addEventListener('click', () => {
                 const app = item.dataset.app;
@@ -918,7 +1130,6 @@ echo "Utilisateur: $(whoami)"</textarea>
             });
         });
 
-        // Boutons de contrôle des fenêtres
         document.querySelectorAll('.close').forEach(btn => {
             btn.addEventListener('click', () => {
                 closeWindow(btn.dataset.window);
@@ -937,7 +1148,6 @@ echo "Utilisateur: $(whoami)"</textarea>
             });
         });
 
-        // Drag windows
         document.querySelectorAll('.window-header').forEach(header => {
             let isDragging = false;
             let currentX, currentY, initialX, initialY;
@@ -969,7 +1179,6 @@ echo "Utilisateur: $(whoami)"</textarea>
             });
         });
 
-        // Terminal
         const terminalInput = document.getElementById('terminal-input');
         const terminal = document.getElementById('terminal');
 
@@ -983,8 +1192,7 @@ echo "Utilisateur: $(whoami)"</textarea>
             uname: 'Linux kali 6.5.0-kali3-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.5.6-1kali1 (2024-10-01) x86_64 GNU/Linux',
             'ping google.com': 'PING google.com (142.250.180.46) 56(84) bytes of data.\n64 bytes from par21s19-in-f14.1e100.net: icmp_seq=1 ttl=117 time=12.3 ms\n64 bytes from par21s19-in-f14.1e100.net: icmp_seq=2 ttl=117 time=11.8 ms',
             ifconfig: 'eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n        inet 192.168.1.42  netmask 255.255.255.0  broadcast 192.168.1.255\n        ether 00:0c:29:3f:8a:2b  txqueuelen 1000  (Ethernet)',
-            neofetch: `
-       ,.....                                       
+            neofetch: `       ,.....                                       
      .'   ,:;';';:,.                               
    .'   ,'         ':.                             
   /    /               ',                          
@@ -1016,13 +1224,11 @@ Memory: 3892MiB / 7890MiB`,
             if (e.key === 'Enter') {
                 const cmd = terminalInput.value.trim();
                 
-                // Afficher la commande
                 const cmdLine = document.createElement('div');
                 cmdLine.className = 'terminal-line';
                 cmdLine.innerHTML = `<span class="terminal-prompt">kali@kali:~$</span> ${cmd}`;
                 terminal.insertBefore(cmdLine, terminal.lastElementChild);
                 
-                // Exécuter la commande
                 const output = commands[cmd] || `bash: ${cmd}: commande introuvable`;
                 
                 if (output === 'CLEAR') {
@@ -1047,7 +1253,6 @@ Memory: 3892MiB / 7890MiB`,
             }
         });
 
-        // Calculatrice
         function calcInput(val) {
             if (calcValue === '0') {
                 calcValue = val;
@@ -1075,7 +1280,6 @@ Memory: 3892MiB / 7890MiB`,
             }
         }
 
-        // Moniteur système - Animation
         function updateSystemMonitor() {
             const cpu = document.getElementById('cpu-usage');
             const ram = document.getElementById('ram-usage');
@@ -1099,7 +1303,6 @@ Memory: 3892MiB / 7890MiB`,
 
         setInterval(updateSystemMonitor, 2000);
 
-        // Exécution d'outils
         function runTool(tool) {
             showNotification('Outil Kali', `Lancement de ${tool}...`);
             openWindow('terminal-window');
@@ -1119,11 +1322,9 @@ Memory: 3892MiB / 7890MiB`,
             }, 500);
         }
 
-        // Message de bienvenue
         setTimeout(() => {
             showNotification('Bienvenue', 'Kali Linux est prêt!');
         }, 1000);
     </script>
 </body>
-</html>cursor: pointer;" onclick="showNotification('Volume', 'Volume: 75%')">🔊</span>
-            <span style="
+</html>
