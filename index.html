@@ -756,5 +756,374 @@ echo "Utilisateur: $(whoami)"</textarea>
         <div class="app-menu" id="menu-btn">🐉 Applications</div>
         <div class="taskbar-apps" id="taskbar-apps"></div>
         <div class="system-tray">
-            <span style="cursor: pointer;" onclick="showNotification('Volume', 'Volume: 75%')">🔊</span>
+            <span style="cursor: pointer;" onclick="showNotification('WiFi', 'Connecté: KaliNet')">📶</span>
+            <span style="cursor: pointer;" onclick="openWindow('monitor-window')">⚡</span>
+            <span id="clock">00:00</span>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let calcValue = '0';
+        let calcOperation = '';
+        let calcPrevious = '';
+
+        // Gestion de l'horloge
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Gestion du menu
+        const menuBtn = document.getElementById('menu-btn');
+        const appMenu = document.getElementById('app-menu');
+        
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            appMenu.classList.toggle('active');
+            contextMenu.classList.remove('active');
+        });
+
+        document.addEventListener('click', () => {
+            appMenu.classList.remove('active');
+            contextMenu.classList.remove('active');
+        });
+
+        // Menu contextuel
+        const contextMenu = document.getElementById('context-menu');
+        const desktop = document.getElementById('desktop');
+
+        desktop.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.top = e.pageY + 'px';
+            contextMenu.classList.add('active');
+            appMenu.classList.remove('active');
+        });
+
+        // Notifications
+        function showNotification(title, text) {
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.innerHTML = `
+                <div class="notif-title">${title}</div>
+                <div class="notif-text">${text}</div>
+            `;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+
+        // Gestion des fenêtres
+        let zIndex = 100;
+        const windowStates = {};
+
+        function openWindow(windowId) {
+            const win = document.getElementById(windowId);
+            if (win) {
+                win.classList.add('active');
+                win.style.zIndex = ++zIndex;
+                updateTaskbar(windowId, true);
+            }
+        }
+
+        function closeWindow(windowId) {
+            const win = document.getElementById(windowId);
+            if (win) {
+                win.classList.remove('active');
+                updateTaskbar(windowId, false);
+            }
+        }
+
+        function minimizeWindow(windowId) {
+            const win = document.getElementById(windowId);
+            if (win) {
+                win.classList.remove('active');
+            }
+        }
+
+        function maximizeWindow(windowId) {
+            const win = document.getElementById(windowId);
+            if (win) {
+                if (!windowStates[windowId]) {
+                    windowStates[windowId] = {
+                        left: win.style.left,
+                        top: win.style.top,
+                        width: win.style.width,
+                        height: win.style.height
+                    };
+                    win.classList.add('maximized');
+                } else {
+                    win.style.left = windowStates[windowId].left;
+                    win.style.top = windowStates[windowId].top;
+                    win.style.width = windowStates[windowId].width;
+                    win.style.height = windowStates[windowId].height;
+                    win.classList.remove('maximized');
+                    windowStates[windowId] = null;
+                }
+            }
+        }
+
+        function updateTaskbar(windowId, isOpen) {
+            const taskbarApps = document.getElementById('taskbar-apps');
+            let appBtn = document.querySelector(`[data-taskbar="${windowId}"]`);
+            
+            if (isOpen && !appBtn) {
+                appBtn = document.createElement('div');
+                appBtn.className = 'taskbar-app active';
+                appBtn.dataset.taskbar = windowId;
+                appBtn.textContent = document.querySelector(`#${windowId} .window-title`).textContent;
+                appBtn.addEventListener('click', () => {
+                    const win = document.getElementById(windowId);
+                    if (win.classList.contains('active')) {
+                        minimizeWindow(windowId);
+                        appBtn.classList.remove('active');
+                    } else {
+                        openWindow(windowId);
+                        appBtn.classList.add('active');
+                    }
+                });
+                taskbarApps.appendChild(appBtn);
+            } else if (!isOpen && appBtn) {
+                appBtn.remove();
+            }
+        }
+
+        // Icônes du bureau
+        let selectedIcon = null;
+
+        document.querySelectorAll('.desktop-icon').forEach(icon => {
+            icon.addEventListener('click', () => {
+                if (selectedIcon) selectedIcon.classList.remove('selected');
+                icon.classList.add('selected');
+                selectedIcon = icon;
+            });
+
+            icon.addEventListener('dblclick', () => {
+                const app = icon.dataset.app;
+                openWindow(`${app}-window`);
+            });
+        });
+
+        // Menu items et fichiers
+        document.querySelectorAll('.menu-item[data-app], .file-item[data-app], .context-item[data-app]').forEach(item => {
+            item.addEventListener('click', () => {
+                const app = item.dataset.app;
+                openWindow(`${app}-window`);
+                appMenu.classList.remove('active');
+                contextMenu.classList.remove('active');
+            });
+        });
+
+        // Boutons de contrôle des fenêtres
+        document.querySelectorAll('.close').forEach(btn => {
+            btn.addEventListener('click', () => {
+                closeWindow(btn.dataset.window);
+            });
+        });
+
+        document.querySelectorAll('.minimize').forEach(btn => {
+            btn.addEventListener('click', () => {
+                minimizeWindow(btn.dataset.window);
+            });
+        });
+
+        document.querySelectorAll('.maximize').forEach(btn => {
+            btn.addEventListener('click', () => {
+                maximizeWindow(btn.dataset.window);
+            });
+        });
+
+        // Drag windows
+        document.querySelectorAll('.window-header').forEach(header => {
+            let isDragging = false;
+            let currentX, currentY, initialX, initialY;
+
+            header.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('window-control')) return;
+                const win = header.closest('.window');
+                if (win.classList.contains('maximized')) return;
+                
+                isDragging = true;
+                win.style.zIndex = ++zIndex;
+                initialX = e.clientX - win.offsetLeft;
+                initialY = e.clientY - win.offsetTop;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    const win = header.closest('.window');
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    win.style.left = currentX + 'px';
+                    win.style.top = currentY + 'px';
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        });
+
+        // Terminal
+        const terminalInput = document.getElementById('terminal-input');
+        const terminal = document.getElementById('terminal');
+
+        const commands = {
+            help: 'Commandes disponibles:\n  help     - Affiche cette aide\n  ls       - Liste les fichiers\n  pwd      - Répertoire actuel\n  whoami   - Utilisateur actuel\n  neofetch - Info système\n  clear    - Efface le terminal\n  nmap     - Scanner réseau\n  date     - Date et heure\n  uptime   - Temps de fonctionnement\n  uname    - Info système\n  ping     - Test de connexion\n  ifconfig - Configuration réseau',
+            ls: 'Documents  Images  Scripts  Téléchargements  readme.txt  music.mp3  video.mp4  image.png',
+            pwd: '/home/kali',
+            whoami: 'kali',
+            date: new Date().toString(),
+            uptime: '12:34:56 up 2 days, 14:22, 1 user, load average: 0.45, 0.38, 0.32',
+            uname: 'Linux kali 6.5.0-kali3-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.5.6-1kali1 (2024-10-01) x86_64 GNU/Linux',
+            'ping google.com': 'PING google.com (142.250.180.46) 56(84) bytes of data.\n64 bytes from par21s19-in-f14.1e100.net: icmp_seq=1 ttl=117 time=12.3 ms\n64 bytes from par21s19-in-f14.1e100.net: icmp_seq=2 ttl=117 time=11.8 ms',
+            ifconfig: 'eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n        inet 192.168.1.42  netmask 255.255.255.0  broadcast 192.168.1.255\n        ether 00:0c:29:3f:8a:2b  txqueuelen 1000  (Ethernet)',
+            neofetch: `
+       ,.....                                       
+     .'   ,:;';';:,.                               
+   .'   ,'         ':.                             
+  /    /               ',                          
+  ;    ;.::::.           :                         
+  :    ' :':.  :.         :                        
+ :      .,:'   . .        :                       
+ :     .' . . . . .        :                      
+ :    ' . . . . . .         :                     
+ ;   '  . . . . .            ;                    
+ ;  '                         :                   
+;:                             :                  
+                                                  
+OS: Kali GNU/Linux Rolling x86_64
+Host: VirtualBox 1.2
+Kernel: 6.5.0-kali3-amd64
+Uptime: 2 days, 14 hours, 22 mins
+Packages: 2847 (dpkg)
+Shell: bash 5.2.15
+Resolution: 1920x1080
+Terminal: gnome-terminal
+CPU: Intel i7-9750H (6) @ 2.600GHz
+GPU: VMware SVGA II Adapter
+Memory: 3892MiB / 7890MiB`,
+            clear: 'CLEAR',
+            nmap: 'Starting Nmap 7.94 ( https://nmap.org )\nNmap scan report for 192.168.1.1\nHost is up (0.00050s latency)\nPORT     STATE SERVICE\n22/tcp   open  ssh\n80/tcp   open  http\n443/tcp  open  https\n8080/tcp open  http-proxy\n\nNmap done: 1 IP address (1 host up) scanned in 0.12 seconds'
+        };
+
+        terminalInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = terminalInput.value.trim();
+                
+                // Afficher la commande
+                const cmdLine = document.createElement('div');
+                cmdLine.className = 'terminal-line';
+                cmdLine.innerHTML = `<span class="terminal-prompt">kali@kali:~$</span> ${cmd}`;
+                terminal.insertBefore(cmdLine, terminal.lastElementChild);
+                
+                // Exécuter la commande
+                const output = commands[cmd] || `bash: ${cmd}: commande introuvable`;
+                
+                if (output === 'CLEAR') {
+                    terminal.innerHTML = '';
+                    const promptLine = document.createElement('div');
+                    promptLine.className = 'terminal-line';
+                    promptLine.innerHTML = '<span class="terminal-prompt">kali@kali:~$</span> <input type="text" class="terminal-input" id="terminal-input" autofocus>';
+                    terminal.appendChild(promptLine);
+                    document.getElementById('terminal-input').focus();
+                } else {
+                    const lines = output.split('\n');
+                    lines.forEach(line => {
+                        const div = document.createElement('div');
+                        div.className = 'terminal-line';
+                        div.textContent = line;
+                        terminal.insertBefore(div, terminal.lastElementChild);
+                    });
+                }
+                
+                terminalInput.value = '';
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        });
+
+        // Calculatrice
+        function calcInput(val) {
+            if (calcValue === '0') {
+                calcValue = val;
+            } else {
+                calcValue += val;
+            }
+            document.getElementById('calc-display').textContent = calcValue;
+        }
+
+        function calcClear() {
+            calcValue = '0';
+            calcOperation = '';
+            calcPrevious = '';
+            document.getElementById('calc-display').textContent = calcValue;
+        }
+
+        function calcEqual() {
+            try {
+                const result = eval(calcValue);
+                calcValue = result.toString();
+                document.getElementById('calc-display').textContent = calcValue;
+            } catch (e) {
+                document.getElementById('calc-display').textContent = 'Erreur';
+                calcValue = '0';
+            }
+        }
+
+        // Moniteur système - Animation
+        function updateSystemMonitor() {
+            const cpu = document.getElementById('cpu-usage');
+            const ram = document.getElementById('ram-usage');
+            const disk = document.getElementById('disk-usage');
+            const network = document.getElementById('network-usage');
+            
+            const cpuVal = Math.floor(Math.random() * 40) + 30;
+            const ramVal = Math.floor(Math.random() * 30) + 50;
+            const diskVal = Math.floor(Math.random() * 10) + 35;
+            const netVal = Math.floor(Math.random() * 50) + 10;
+            
+            cpu.style.width = cpuVal + '%';
+            cpu.textContent = cpuVal + '%';
+            ram.style.width = ramVal + '%';
+            ram.textContent = ramVal + '%';
+            disk.style.width = diskVal + '%';
+            disk.textContent = diskVal + '%';
+            network.style.width = netVal + '%';
+            network.textContent = netVal + '%';
+        }
+
+        setInterval(updateSystemMonitor, 2000);
+
+        // Exécution d'outils
+        function runTool(tool) {
+            showNotification('Outil Kali', `Lancement de ${tool}...`);
+            openWindow('terminal-window');
+            
+            const terminal = document.getElementById('terminal');
+            const toolMsg = document.createElement('div');
+            toolMsg.className = 'terminal-line';
+            toolMsg.innerHTML = `<span class="terminal-prompt">kali@kali:~$</span> ${tool}`;
+            terminal.insertBefore(toolMsg, terminal.lastElementChild);
+            
+            setTimeout(() => {
+                const output = document.createElement('div');
+                output.className = 'terminal-line';
+                output.textContent = `${tool} lancé avec succès!`;
+                terminal.insertBefore(output, terminal.lastElementChild);
+                terminal.scrollTop = terminal.scrollHeight;
+            }, 500);
+        }
+
+        // Message de bienvenue
+        setTimeout(() => {
+            showNotification('Bienvenue', 'Kali Linux est prêt!');
+        }, 1000);
+    </script>
+</body>
+</html>cursor: pointer;" onclick="showNotification('Volume', 'Volume: 75%')">🔊</span>
             <span style="
