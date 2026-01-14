@@ -2,42 +2,759 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Kali Linux Web OS</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kali Linux Desktop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .desktop {
+            height: calc(100vh - 40px);
+            position: relative;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect fill="%231a1a2e" width="1920" height="1080"/><path d="M960 200 L1100 500 L820 500 Z" fill="%23367bf0" opacity="0.1"/><path d="M400 600 L600 900 L200 900 Z" fill="%23367bf0" opacity="0.08"/></svg>');
+            background-size: cover;
+        }
+
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: #1a1a2e;
+            border-top: 1px solid #367bf0;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            z-index: 1000;
+        }
+
+        .app-menu {
+            background: #367bf0;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .app-menu:hover {
+            background: #2868d8;
+            transform: translateY(-2px);
+        }
+
+        .taskbar-apps {
+            display: flex;
+            gap: 5px;
+            margin-left: 15px;
+            flex: 1;
+        }
+
+        .taskbar-app {
+            background: rgba(54, 123, 240, 0.2);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .taskbar-app:hover {
+            background: rgba(54, 123, 240, 0.4);
+        }
+
+        .taskbar-app.active {
+            background: #367bf0;
+        }
+
+        .system-tray {
+            display: flex;
+            gap: 15px;
+            color: #fff;
+            font-size: 13px;
+            align-items: center;
+        }
+
+        .desktop-icon {
+            width: 80px;
+            padding: 10px;
+            text-align: center;
+            color: white;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            position: absolute;
+            user-select: none;
+        }
+
+        .desktop-icon:hover {
+            background: rgba(54, 123, 240, 0.3);
+            transform: scale(1.05);
+        }
+
+        .desktop-icon.selected {
+            background: rgba(54, 123, 240, 0.5);
+        }
+
+        .desktop-icon .icon {
+            font-size: 48px;
+            margin-bottom: 5px;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .desktop-icon .label {
+            font-size: 12px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .window {
+            position: absolute;
+            background: #2a2a3e;
+            border: 1px solid #367bf0;
+            border-radius: 8px;
+            min-width: 400px;
+            min-height: 300px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            animation: windowOpen 0.3s ease-out;
+        }
+
+        @keyframes windowOpen {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .window.active {
+            display: flex;
+            z-index: 100;
+        }
+
+        .window.maximized {
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: calc(100vh - 40px) !important;
+            border-radius: 0;
+        }
+
+        .window-header {
+            background: #1a1a2e;
+            padding: 10px;
+            border-bottom: 1px solid #367bf0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .window.maximized .window-header {
+            border-radius: 0;
+        }
+
+        .window-title {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .window-control {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .minimize { background: #f4c430; }
+        .maximize { background: #50c878; }
+        .close { background: #ff6b6b; }
+
+        .window-control:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+
+        .window-content {
+            flex: 1;
+            padding: 15px;
+            color: #fff;
+            overflow: auto;
+            background: #1e1e2e;
+        }
+
+        .terminal {
+            background: #0a0a0a;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            color: #0f0;
+            margin: 3px 0;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .terminal-prompt {
+            color: #367bf0;
+        }
+
+        .terminal-input {
+            background: none;
+            border: none;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            outline: none;
+            width: 80%;
+        }
+
+        .menu-panel {
+            position: fixed;
+            bottom: 45px;
+            left: 10px;
+            width: 350px;
+            background: #1a1a2e;
+            border: 1px solid #367bf0;
+            border-radius: 8px;
+            display: none;
+            padding: 15px;
+            z-index: 999;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .menu-panel.active {
+            display: block;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .menu-category {
+            color: #367bf0;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .menu-item {
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-item:hover {
+            background: #367bf0;
+            transform: translateX(5px);
+        }
+
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            padding: 10px;
+        }
+
+        .file-item {
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-item:hover {
+            background: rgba(54, 123, 240, 0.2);
+            transform: scale(1.05);
+        }
+
+        .file-icon {
+            font-size: 48px;
+            margin-bottom: 5px;
+        }
+
+        .text-editor {
+            background: #1e1e2e;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            height: 100%;
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 14px;
+        }
+
+        .browser-bar {
+            background: #1a1a2e;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .browser-input {
+            flex: 1;
+            background: #2a2a3e;
+            border: 1px solid #367bf0;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .browser-content {
+            background: #fff;
+            color: #000;
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .system-monitor {
+            padding: 15px;
+        }
+
+        .monitor-section {
+            margin-bottom: 20px;
+        }
+
+        .monitor-label {
+            color: #367bf0;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            background: #2a2a3e;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #367bf0, #50c878);
+            height: 100%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .calc-display {
+            background: #0a0a0a;
+            color: #0f0;
+            padding: 20px;
+            text-align: right;
+            font-size: 32px;
+            font-family: monospace;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            background: #367bf0;
+            color: white;
+            padding: 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .calc-btn:hover {
+            background: #2868d8;
+            transform: scale(1.05);
+        }
+
+        .notification {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background: #1a1a2e;
+            border: 1px solid #367bf0;
+            border-radius: 8px;
+            padding: 15px;
+            min-width: 300px;
+            z-index: 2000;
+            animation: slideInRight 0.3s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notif-title {
+            color: #367bf0;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .notif-text {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .context-menu {
+            position: fixed;
+            background: #1a1a2e;
+            border: 1px solid #367bf0;
+            border-radius: 4px;
+            padding: 5px;
+            display: none;
+            z-index: 3000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .context-menu.active {
+            display: block;
+        }
+
+        .context-item {
+            padding: 8px 15px;
+            color: white;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .context-item:hover {
+            background: #367bf0;
+        }
+    </style>
 </head>
 <body>
-
-    <div class="desktop">
-        <nav class="top-bar">
-            <div class="left"><i class="fa-solid fa-dragon"></i> Applications</div>
-            <div class="center">13 Jan, 20:37</div>
-            <div class="right">
-                <i class="fa-solid fa-wifi"></i>
-                <i class="fa-solid fa-volume-high"></i>
-                <i class="fa-solid fa-battery-full"></i>
-            </div>
-        </nav>
-
-        <div class="icon" onclick="openWindow('terminal')">
-            <img src="https://cdn-icons-png.flaticon.com/512/906/906334.png" alt="Terminal">
-            <span>Terminal</span>
+    <div class="desktop" id="desktop">
+        <!-- Icônes du bureau -->
+        <div class="desktop-icon" style="top: 20px; left: 20px;" data-app="terminal">
+            <div class="icon">💻</div>
+            <div class="label">Terminal</div>
         </div>
+        <div class="desktop-icon" style="top: 140px; left: 20px;" data-app="files">
+            <div class="icon">📁</div>
+            <div class="label">Fichiers</div>
+        </div>
+        <div class="desktop-icon" style="top: 260px; left: 20px;" data-app="tools">
+            <div class="icon">🛠️</div>
+            <div class="label">Outils Kali</div>
+        </div>
+        <div class="desktop-icon" style="top: 380px; left: 20px;" data-app="browser">
+            <div class="icon">🌐</div>
+            <div class="label">Navigateur</div>
+        </div>
+        <div class="desktop-icon" style="top: 20px; right: 20px;" data-app="editor">
+            <div class="icon">📝</div>
+            <div class="label">Éditeur</div>
+        </div>
+        <div class="desktop-icon" style="top: 140px; right: 20px;" data-app="monitor">
+            <div class="icon">📊</div>
+            <div class="label">Moniteur</div>
+        </div>
+        <div class="desktop-icon" style="top: 260px; right: 20px;" data-app="calc">
+            <div class="icon">🔢</div>
+            <div class="label">Calculatrice</div>
+        </div>
+    </div>
 
-        <div id="terminal" class="window">
-            <div class="window-header">
-                <span>root@kali: ~</span>
-                <div class="controls">
-                    <span class="dot yellow"></span>
-                    <span class="dot red" onclick="closeWindow('terminal')"></span>
-                </div>
+    <!-- Fenêtre Terminal -->
+    <div class="window" id="terminal-window" style="left: 100px; top: 100px; width: 700px; height: 450px;">
+        <div class="window-header">
+            <div class="window-title">🐉 Terminal - Kali Linux</div>
+            <div class="window-controls">
+                <div class="window-control minimize" data-window="terminal-window"></div>
+                <div class="window-control maximize" data-window="terminal-window"></div>
+                <div class="window-control close" data-window="terminal-window"></div>
             </div>
-            <div class="window-content">
-                <p>kali@linux:~$ <span class="cursor">_</span></p>
+        </div>
+        <div class="window-content terminal" id="terminal">
+            <div class="terminal-line">Kali Linux 2024.1 LTS</div>
+            <div class="terminal-line">Bienvenue dans le simulateur Kali Linux</div>
+            <div class="terminal-line">Tapez 'help' pour voir les commandes disponibles</div>
+            <div class="terminal-line"><span class="terminal-prompt">kali@kali:~$</span> <input type="text" class="terminal-input" id="terminal-input" autofocus></div>
+        </div>
+    </div>
+
+    <!-- Fenêtre Fichiers -->
+    <div class="window" id="files-window" style="left: 200px; top: 150px; width: 600px; height: 400px;">
+        <div class="window-header">
+            <div class="window-title">📁 Gestionnaire de fichiers</div>
+            <div class="window-controls">
+                <div class="window-control minimize" data-window="files-window"></div>
+                <div class="window-control maximize" data-window="files-window"></div>
+                <div class="window-control close" data-window="files-window"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="files-grid">
+                <div class="file-item" data-app="editor">
+                    <div class="file-icon">📂</div>
+                    <div>Documents</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">📂</div>
+                    <div>Images</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">📂</div>
+                    <div>Scripts</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">📂</div>
+                    <div>Téléchargements</div>
+                </div>
+                <div class="file-item" data-app="editor">
+                    <div class="file-icon">📄</div>
+                    <div>readme.txt</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">🎵</div>
+                    <div>music.mp3</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">🎬</div>
+                    <div>video.mp4</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">🖼️</div>
+                    <div>image.png</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
-</body>
-</html>
+    <!-- Fenêtre Outils -->
+    <div class="window" id="tools-window" style="left: 300px; top: 200px; width: 500px; height: 400px;">
+        <div class="window-header">
+            <div class="window-title">🛠️ Outils Kali Linux</div>
+            <div class="window-controls">
+                <div class="window-control minimize" data-window="tools-window"></div>
+                <div class="window-control maximize" data-window="tools-window"></div>
+                <div class="window-control close" data-window="tools-window"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="menu-item" onclick="runTool('nmap')">🔍 Nmap - Scanner réseau</div>
+            <div class="menu-item" onclick="runTool('metasploit')">🔓 Metasploit - Framework d'exploitation</div>
+            <div class="menu-item" onclick="runTool('burpsuite')">🌐 Burp Suite - Proxy d'interception</div>
+            <div class="menu-item" onclick="runTool('wireshark')">📡 Wireshark - Analyseur de paquets</div>
+            <div class="menu-item" onclick="runTool('john')">🔐 John the Ripper - Cracker de mots de passe</div>
+            <div class="menu-item" onclick="runTool('aircrack')">🦈 Aircrack-ng - Suite WiFi</div>
+            <div class="menu-item" onclick="runTool('sqlmap')">💉 SQLMap - Injection SQL</div>
+            <div class="menu-item" onclick="runTool('hydra')">💧 Hydra - Brute force</div>
+        </div>
+    </div>
+
+    <!-- Fenêtre Navigateur -->
+    <div class="window" id="browser-window" style="left: 150px; top: 100px; width: 800px; height: 600px;">
+        <div class="window-header">
+            <div class="window-title">🌐 Navigateur Web</div>
+            <div class="window-controls">
+                <div class="window-control minimize" data-window="browser-window"></div>
+                <div class="window-control maximize" data-window="browser-window"></div>
+                <div class="window-control close" data-window="browser-window"></div>
+            </div>
+        </div>
+        <div class="window-content" style="padding: 0;">
+            <div class="browser-bar">
+                <button class="calc-btn" style="padding: 5px 10px; font-size: 14px;" onclick="history.back()">◀</button>
+                <button class="calc-btn" style="padding: 5px 10px; font-size: 14px;" onclick="history.forward()">▶</button>
+                <input type="text" class="browser-input" id="browser-url" value="https://www.kali.org" placeholder="Entrez une URL...">
+                <button class="calc-btn" style="padding: 5px 10px; font-size: 14px;" onclick="loadUrl()">Go</button>
+            </div>
+            <div class="browser-content">
+                <h1>🐉 Bienvenue sur Kali Linux</h1>
+                <p>Kali Linux est une distribution Debian spécialement conçue pour les tests de sécurité et l'analyse forensique.</p>
+                <h2>Outils populaires :</h2>
+                <ul>
+                    <li>Nmap - Scanner de ports</li>
+                    <li>Metasploit - Framework de pénétration</li>
+                    <li>Wireshark - Analyseur de protocoles</li>
+                    <li>Burp Suite - Test d'applications web</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre Éditeur de texte -->
+    <div class="window" id="editor-window" style="left: 250px; top: 120px; width: 600px; height: 500px;">
+        <div class="window-header">
+            <div class="window-title">📝 Éditeur de texte</div>
+            <div class="window-controls">
+                <div class="window-control minimize" data-window="editor-window"></div>
+                <div class="window-control maximize" data-window="editor-window"></div>
+                <div class="window-control close" data-window="editor-window"></div>
+            </div>
+        </div>
+        <div class="window-content" style="padding: 0;">
+            <textarea class="text-editor" placeholder="Commencez à écrire...">#!/bin/bash
+# Script Kali Linux
+echo "Bienvenue sur Kali Linux"
+echo "Système: $(uname -a)"
+echo "Utilisateur: $(whoami)"</textarea>
+        </div>
+    </div>
+
+    <!-- Fenêtre Moniteur Système -->
+    <div class="window" id="monitor-window" style="left: 350px; top: 80px; width: 500px; height: 450px;">
+        <div class="window-header">
+            <div class="window-title">📊 Moniteur Système</div>
+            <div class="window-controls">
+                <div class="window-control minimize" data-window="monitor-window"></div>
+                <div class="window-control maximize" data-window="monitor-window"></div>
+                <div class="window-control close" data-window="monitor-window"></div>
+            </div>
+        </div>
+        <div class="window-content system-monitor">
+            <div class="monitor-section">
+                <div class="monitor-label">CPU</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="cpu-usage" style="width: 45%">45%</div>
+                </div>
+            </div>
+            <div class="monitor-section">
+                <div class="monitor-label">RAM</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="ram-usage" style="width: 62%">62%</div>
+                </div>
+            </div>
+            <div class="monitor-section">
+                <div class="monitor-label">Disque</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="disk-usage" style="width: 38%">38%</div>
+                </div>
+            </div>
+            <div class="monitor-section">
+                <div class="monitor-label">Réseau</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="network-usage" style="width: 28%">28%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre Calculatrice -->
+    <div class="window" id="calc-window" style="left: 400px; top: 150px; width: 350px; height: 500px;">
+        <div class="window-header">
+            <div class="window-title">🔢 Calculatrice</div>
+            <div class="window-controls">
+                <div class="window-control minimize" data-window="calc-window"></div>
+                <div class="window-control maximize" data-window="calc-window"></div>
+                <div class="window-control close" data-window="calc-window"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="calc-display" id="calc-display">0</div>
+            <div class="calc-buttons">
+                <button class="calc-btn" onclick="calcInput('7')">7</button>
+                <button class="calc-btn" onclick="calcInput('8')">8</button>
+                <button class="calc-btn" onclick="calcInput('9')">9</button>
+                <button class="calc-btn" onclick="calcInput('/')">/</button>
+                <button class="calc-btn" onclick="calcInput('4')">4</button>
+                <button class="calc-btn" onclick="calcInput('5')">5</button>
+                <button class="calc-btn" onclick="calcInput('6')">6</button>
+                <button class="calc-btn" onclick="calcInput('*')">*</button>
+                <button class="calc-btn" onclick="calcInput('1')">1</button>
+                <button class="calc-btn" onclick="calcInput('2')">2</button>
+                <button class="calc-btn" onclick="calcInput('3')">3</button>
+                <button class="calc-btn" onclick="calcInput('-')">-</button>
+                <button class="calc-btn" onclick="calcInput('0')">0</button>
+                <button class="calc-btn" onclick="calcInput('.')">.</button>
+                <button class="calc-btn" onclick="calcEqual()">=</button>
+                <button class="calc-btn" onclick="calcInput('+')">+</button>
+                <button class="calc-btn" onclick="calcClear()" style="grid-column: span 4; background: #ff6b6b;">C</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Application -->
+    <div class="menu-panel" id="app-menu">
+        <div class="menu-category">⚡ Favoris</div>
+        <div class="menu-item" data-app="terminal">💻 Terminal</div>
+        <div class="menu-item" data-app="browser">🌐 Navigateur</div>
+        <div class="menu-item" data-app="files">📁 Fichiers</div>
+        
+        <div class="menu-category">🛠️ Outils Kali</div>
+        <div class="menu-item" data-app="tools">🔧 Suite d'outils</div>
+        <div class="menu-item" data-app="terminal">🔍 Scanner réseau</div>
+        
+        <div class="menu-category">📱 Applications</div>
+        <div class="menu-item" data-app="editor">📝 Éditeur de texte</div>
+        <div class="menu-item" data-app="calc">🔢 Calculatrice</div>
+        <div class="menu-item" data-app="monitor">📊 Moniteur système</div>
+        
+        <div class="menu-category">⚙️ Système</div>
+        <div class="menu-item" onclick="showNotification('Paramètres', 'Fonctionnalité à venir...')">⚙️ Paramètres</div>
+        <div class="menu-item" onclick="showNotification('Déconnexion', 'À bientôt!')">🚪 Déconnexion</div>
+        <div class="menu-item" onclick="showNotification('Extinction', 'Système en cours d\'arrêt...')">🔌 Éteindre</div>
+    </div>
+
+    <!-- Menu contextuel -->
+    <div class="context-menu" id="context-menu">
+        <div class="context-item" data-app="terminal">Ouvrir Terminal</div>
+        <div class="context-item" data-app="files">Ouvrir Fichiers</div>
+        <div class="context-item" onclick="showNotification('Rafraîchir', 'Bureau rafraîchi!')">Rafraîchir</div>
+        <div class="context-item" onclick="showNotification('Fond d\'écran', 'Personnalisation à venir...')">Changer le fond</div>
+    </div>
+
+    <!-- Barre des tâches -->
+    <div class="taskbar">
+        <div class="app-menu" id="menu-btn">🐉 Applications</div>
+        <div class="taskbar-apps" id="taskbar-apps"></div>
+        <div class="system-tray">
+            <span style="cursor: pointer;" onclick="showNotification('Volume', 'Volume: 75%')">🔊</span>
+            <span style="
