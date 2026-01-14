@@ -1,0 +1,70 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+}
+
+.desktop {
+    background: url('https://images.wallpapersden.com/image/download/kali-linux-4k-cool-art_bWlpZ2mUmZqaraWkpJRmbmdlrWZlbWU.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    position: relative;
+}
+
+/* Barre du haut */
+.top-bar {
+    background: rgba(30, 30, 30, 0.9);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 15px;
+    font-size: 14px;
+    border-bottom: 1px solid #444;
+}
+
+/* Icônes */
+.icon {
+    width: 80px;
+    text-align: center;
+    color: white;
+    margin: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.icon img { width: 50px; }
+.icon span { display: block; font-size: 12px; text-shadow: 1px 1px 2px black; }
+.icon:hover { background: rgba(255, 255, 255, 0.1); border-radius: 5px; }
+
+/* Fenêtres */
+.window {
+    width: 600px;
+    height: 350px;
+    background: #0d0d0d;
+    border: 1px solid #444;
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    display: none; /* Caché au départ */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.window-header {
+    background: #2d2d2d;
+    padding: 5px 10px;
+    color: #ccc;
+    display: flex;
+    justify-content: space-between;
+}
+
+.dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; cursor: pointer; }
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+
+.window-content {
+    color: #00ff00;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+}
