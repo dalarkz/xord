@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kali Linux Desktop</title>
+    <title>Kali Linux Desktop - Charles Arsenault</title>
     <style>
         * {
             margin: 0;
@@ -13,16 +13,28 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #000;
             overflow: hidden;
             height: 100vh;
+        }
+
+        /* Effet Matrix en arrière-plan */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.2;
+            pointer-events: none;
         }
 
         .desktop {
             height: calc(100vh - 40px);
             position: relative;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect fill="%231a1a2e" width="1920" height="1080"/><path d="M960 200 L1100 500 L820 500 Z" fill="%23367bf0" opacity="0.1"/><path d="M400 600 L600 900 L200 900 Z" fill="%23367bf0" opacity="0.08"/></svg>');
-            background-size: cover;
+            z-index: 1;
+            background: rgba(26, 26, 46, 0.6);
         }
 
         .taskbar {
@@ -76,10 +88,6 @@
 
         .taskbar-app:hover {
             background: rgba(54, 123, 240, 0.4);
-        }
-
-        .taskbar-app.active {
-            background: #367bf0;
         }
 
         .system-tray {
@@ -367,6 +375,8 @@
     </style>
 </head>
 <body>
+    <canvas id="matrix-canvas"></canvas>
+
     <div class="desktop" id="desktop">
         <div class="desktop-icon" style="top: 20px; left: 20px;" data-app="terminal">
             <div class="icon">💻</div>
@@ -391,6 +401,10 @@
         <div class="desktop-icon" style="top: 140px; right: 20px;" data-app="calc">
             <div class="icon">🔢</div>
             <div class="label">Calculatrice</div>
+        </div>
+        <div class="desktop-icon" style="top: 260px; right: 20px;" data-app="passgen">
+            <div class="icon">🔑</div>
+            <div class="label">PassGen</div>
         </div>
     </div>
 
@@ -480,20 +494,6 @@ echo "Prêt."</textarea>
                 </div>
                 <div class="progress-bar"><div class="progress-fill" id="ram-usage" style="width: 62%"></div></div>
             </div>
-            <div style="margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Disk Space</span>
-                    <span id="disk-text">28%</span>
-                </div>
-                <div class="progress-bar"><div class="progress-fill" id="disk-usage" style="width: 28%"></div></div>
-            </div>
-            <div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Network Traffic</span>
-                    <span id="net-text">12%</span>
-                </div>
-                <div class="progress-bar"><div class="progress-fill" id="net-usage" style="width: 12%"></div></div>
-            </div>
         </div>
     </div>
 
@@ -520,11 +520,22 @@ echo "Prêt."</textarea>
                 <button class="calc-btn" onclick="calcInput('3')">3</button>
                 <button class="calc-btn" onclick="calcInput('-')">-</button>
                 <button class="calc-btn" onclick="calcInput('0')">0</button>
-                <button class="calc-btn" onclick="calcInput('.')">.</button>
                 <button class="calc-btn" onclick="calcEqual()">=</button>
-                <button class="calc-btn" onclick="calcInput('+')">+</button>
-                <button class="calc-btn" onclick="calcClear()" style="grid-column: span 4; background: #ff6b6b; margin-top: 10px;">Effacer</button>
+                <button class="calc-btn" onclick="calcClear()" style="grid-column: span 2; background: #ff6b6b;">CE</button>
             </div>
+        </div>
+    </div>
+
+    <div class="window" id="passgen-window" style="left: 450px; top: 200px; width: 350px; height: 250px;">
+        <div class="window-header">
+            <div class="window-title">🔑 Password Generator</div>
+            <div class="window-controls">
+                <div class="window-control close" data-window="passgen-window"></div>
+            </div>
+        </div>
+        <div class="window-content" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
+            <div id="pass-display" style="background: #000; padding: 15px; margin-bottom: 20px; color: #50c878; font-family: monospace; font-size: 1.2em; border: 1px solid #367bf0;">********</div>
+            <button class="calc-btn" style="width: 100%;" onclick="generateSecurePass()">Générer mot de passe</button>
         </div>
     </div>
 
@@ -532,10 +543,10 @@ echo "Prêt."</textarea>
         <div class="menu-category">Favoris</div>
         <div class="menu-item" data-app="terminal"><span>💻</span> Terminal</div>
         <div class="menu-item" data-app="cv"><span>👤</span> Mon CV</div>
+        <div class="menu-item" data-app="passgen"><span>🔑</span> PassGen</div>
         <div class="menu-category">Outils de test</div>
         <div class="menu-item" onclick="runTool('Nmap')"><span>🔍</span> Nmap</div>
         <div class="menu-item" onclick="runTool('Metasploit')"><span>💀</span> Metasploit</div>
-        <div class="menu-item" onclick="runTool('Wireshark')"><span>🦈</span> Wireshark</div>
         <div class="menu-category">Système</div>
         <div class="menu-item" data-app="monitor"><span>📊</span> Moniteur Système</div>
         <div class="menu-item" onclick="location.reload()"><span>🔄</span> Redémarrer</div>
@@ -543,9 +554,7 @@ echo "Prêt."</textarea>
 
     <div class="context-menu" id="context-menu">
         <div class="context-menu-item" onclick="openWindow('terminal-window')">Ouvrir le terminal ici</div>
-        <div class="context-menu-item" onclick="createNewFolder()">Nouveau dossier</div>
-        <hr style="border: 0.5px solid #367bf0; opacity: 0.3;">
-        <div class="context-menu-item" onclick="changeWallpaper()">Changer le fond d'écran</div>
+        <div class="context-menu-item" onclick="showNotification('Alerte', 'Fonctionnalité en cours de développement')">Nouveau dossier</div>
     </div>
 
     <div class="taskbar">
@@ -555,8 +564,6 @@ echo "Prêt."</textarea>
         <div class="taskbar-apps" id="taskbar-apps"></div>
         <div class="system-tray">
             <span id="clock" style="font-weight: bold;">00:00</span>
-            <span style="cursor: pointer;" onclick="showNotification('Volume', 'Volume: 75%')">🔊</span>
-            <span style="cursor: pointer;" onclick="showNotification('Réseau', 'Connecté à Kali_Net_5G')">📶</span>
             <span style="cursor: pointer; color: #50c878;">🔋 98%</span>
         </div>
     </div>
@@ -565,6 +572,29 @@ echo "Prêt."</textarea>
         let zIndex = 100;
         let windows = [];
         let calcVal = '0';
+
+        // --- EFFET MATRIX ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0F0";
+            ctx.font = fontSize + "px monospace";
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
 
         // Horloge
         function updateClock() {
@@ -580,11 +610,9 @@ echo "Prêt."</textarea>
         function openWindow(id) {
             const win = document.getElementById(id);
             if (!win) return;
-            
             win.style.display = 'flex';
             win.style.zIndex = ++zIndex;
             win.classList.add('active');
-            
             if (!windows.includes(id)) {
                 windows.push(id);
                 updateTaskbar();
@@ -615,22 +643,16 @@ echo "Prêt."</textarea>
         document.querySelectorAll('.window-header').forEach(header => {
             header.onmousedown = function(e) {
                 if (e.target.classList.contains('window-control')) return;
-                
                 const win = header.parentElement;
                 win.style.zIndex = ++zIndex;
-                
                 let shiftX = e.clientX - win.getBoundingClientRect().left;
                 let shiftY = e.clientY - win.getBoundingClientRect().top;
-
                 function moveAt(pageX, pageY) {
                     win.style.left = pageX - shiftX + 'px';
                     win.style.top = pageY - shiftY + 'px';
                 }
-
                 function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
-
                 document.addEventListener('mousemove', onMouseMove);
-
                 document.onmouseup = function() {
                     document.removeEventListener('mousemove', onMouseMove);
                     document.onmouseup = null;
@@ -639,16 +661,12 @@ echo "Prêt."</textarea>
         });
 
         // Icônes du bureau
-        document.querySelectorAll('.desktop-icon').forEach(icon => {
+        document.querySelectorAll('.desktop-icon, .menu-item').forEach(icon => {
             icon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
-                icon.classList.add('selected');
-            });
-
-            icon.addEventListener('dblclick', () => {
-                const appId = icon.dataset.app;
-                openWindow(appId + '-window');
+                if(icon.dataset.app) {
+                    e.stopPropagation();
+                    openWindow(icon.dataset.app + '-window');
+                }
             });
         });
 
@@ -657,37 +675,30 @@ echo "Prêt."</textarea>
             control.addEventListener('click', (e) => {
                 const winId = control.dataset.window;
                 if (control.classList.contains('close')) closeWindow(winId);
-                if (control.classList.contains('maximize')) {
-                    document.getElementById(winId).classList.toggle('maximized');
-                }
+                if (control.classList.contains('maximize')) document.getElementById(winId).classList.toggle('maximized');
             });
         });
 
         // Menu Application
         const menuBtn = document.getElementById('menu-btn');
         const appMenu = document.getElementById('app-menu');
-        menuBtn.onclick = (e) => {
-            e.stopPropagation();
-            appMenu.classList.toggle('active');
-        };
-
-        // Fermer les menus si clic bureau
+        menuBtn.onclick = (e) => { e.stopPropagation(); appMenu.classList.toggle('active'); };
         document.getElementById('desktop').onclick = () => {
             appMenu.classList.remove('active');
             document.getElementById('context-menu').style.display = 'none';
-            document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
         };
 
-        // Terminal
+        // --- TERMINAL AVANCÉ ---
         const terminalInput = document.getElementById('terminal-input');
         const terminal = document.getElementById('terminal');
-
         const commands = {
-            'help': 'Commandes disponibles: help, clear, ls, neofetch, nmap, whoami, date',
-            'ls': 'Documents  Images  Scripts  Desktop  CV_Arsenault.pdf',
+            'help': 'Commandes: help, clear, ls, whoami, date, hack, sudo, neofetch',
+            'ls': '📁 Documents  📁 Images  📁 Scripts  📄 CV_Arsenault.pdf  📄 secrets.txt',
             'whoami': 'kali (Charles Arsenault)',
             'date': new Date().toString(),
-            'neofetch': 'OS: Kali GNU/Linux 2024.1\nKernel: 6.6.9-kali1\nShell: zsh 5.9\nUptime: 2 hours, 15 mins\nPackages: 2450 (dpkg)\nResolution: 1920x1080\nWM: Xfce4\nCPU: AMD Ryzen 7 5800H\nMemory: 8240MiB / 16384MiB'
+            'hack': 'Accès au serveur distant... [||||||||||] 100%\nSystème compromis. (Blague !)',
+            'sudo': 'Utilisateur non présent dans le fichier sudoers. Cet incident sera signalé.',
+            'neofetch': 'OS: Kali GNU/Linux 2024.1\nKernel: 6.6.9-kali1\nCPU: AMD Ryzen 7 5800H\nMemory: 8240MiB / 16384MiB'
         };
 
         terminalInput.onkeydown = (e) => {
@@ -708,12 +719,6 @@ echo "Prêt."</textarea>
                     result.style.whiteSpace = 'pre-wrap';
                     result.textContent = commands[cmd];
                     terminal.insertBefore(result, terminalInput.parentElement);
-                } else if (cmd !== '') {
-                    const error = document.createElement('div');
-                    error.className = 'terminal-line';
-                    error.style.color = '#ff6b6b';
-                    error.textContent = `Commande inconnue: ${cmd}`;
-                    terminal.insertBefore(error, terminalInput.parentElement);
                 }
 
                 terminalInput.value = '';
@@ -721,21 +726,28 @@ echo "Prêt."</textarea>
             }
         };
 
-        // Calculatrice
-        function calcInput(v) {
-            if (calcVal === '0') calcVal = v;
-            else calcVal += v;
-            document.getElementById('calc-display').textContent = calcVal;
-        }
-        function calcClear() { calcVal = '0'; document.getElementById('calc-display').textContent = '0'; }
-        function calcEqual() {
-            try {
-                calcVal = eval(calcVal).toString();
-                document.getElementById('calc-display').textContent = calcVal;
-            } catch { calcVal = 'Erreur'; document.getElementById('calc-display').textContent = calcVal; }
+        // --- GENERATEUR DE PASS ---
+        function generateSecurePass() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+            let password = "";
+            for (let i = 0; i < 16; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('pass-display').textContent = password;
+            showNotification('Sécurité', 'Mot de passe sécurisé généré !');
         }
 
-        // Notifications
+        // Calculatrice
+        function calcInput(v) { 
+            calcVal === '0' ? calcVal = v : calcVal += v; 
+            document.getElementById('calc-display').textContent = calcVal; 
+        }
+        function calcClear() { calcVal = '0'; document.getElementById('calc-display').textContent = '0'; }
+        function calcEqual() { 
+            try { calcVal = eval(calcVal).toString(); document.getElementById('calc-display').textContent = calcVal; } 
+            catch { calcVal = 'Erreur'; document.getElementById('calc-display').textContent = 'Erreur'; } 
+        }
+
         function showNotification(title, msg) {
             const notif = document.createElement('div');
             notif.className = 'notification';
@@ -744,59 +756,29 @@ echo "Prêt."</textarea>
             setTimeout(() => notif.remove(), 4000);
         }
 
-        // Moniteur Système
         function updateSystemMonitor() {
             const cpuVal = Math.floor(Math.random() * 30 + 15);
             const ramVal = Math.floor(Math.random() * 20 + 40);
-            const diskVal = 28;
-            const netVal = Math.floor(Math.random() * 50);
-
-            document.getElementById('cpu-usage').style.width = cpuVal + '%';
-            document.getElementById('cpu-text').textContent = cpuVal + '%';
-            document.getElementById('ram-usage').style.width = ramVal + '%';
-            document.getElementById('ram-text').textContent = ramVal + '%';
-            document.getElementById('disk-usage').style.width = diskVal + '%';
-            document.getElementById('disk-text').textContent = diskVal + '%';
-            document.getElementById('net-usage').style.width = netVal + '%';
-            document.getElementById('net-text').textContent = netVal + '%';
+            if(document.getElementById('cpu-usage')) {
+                document.getElementById('cpu-usage').style.width = cpuVal + '%';
+                document.getElementById('cpu-text').textContent = cpuVal + '%';
+                document.getElementById('ram-usage').style.width = ramVal + '%';
+                document.getElementById('ram-text').textContent = ramVal + '%';
+            }
         }
         setInterval(updateSystemMonitor, 2000);
 
-        // Outils Kali
         function runTool(tool) {
             showNotification('Outil Kali', `Lancement de ${tool}...`);
             openWindow('terminal-window');
-            const term = document.getElementById('terminal');
-            const line = document.createElement('div');
-            line.className = 'terminal-line';
-            line.innerHTML = `<span class="terminal-prompt">kali@kali:~$</span> sudo ${tool.toLowerCase()}`;
-            term.insertBefore(line, terminalInput.parentElement);
         }
 
-        // FONCTION TÉLÉCHARGEMENT CV
         function downloadCV() {
             closeWindow('cv-window');
             openWindow('terminal-window');
-            const term = document.getElementById('terminal');
-            const lines = [
-                "Initiating secure transfer of CV_Arsenault.pdf...",
-                "Connection established with remote storage.",
-                "Decrypting package...",
-                "DOWNLOAD COMPLETE: File saved to /home/kali/Desktop/"
-            ];
-            lines.forEach((l, i) => {
-                setTimeout(() => {
-                    const div = document.createElement('div');
-                    div.className = 'terminal-line';
-                    div.textContent = "> " + l;
-                    if(i === 3) div.style.color = '#50c878';
-                    term.insertBefore(div, terminalInput.parentElement);
-                    term.scrollTop = term.scrollHeight;
-                }, i * 600);
-            });
+            showNotification('Système', 'Téléchargement de CV_Arsenault.pdf...');
         }
 
-        // Menu Contextuel (Clic Droit)
         document.oncontextmenu = (e) => {
             e.preventDefault();
             const menu = document.getElementById('context-menu');
@@ -805,9 +787,7 @@ echo "Prêt."</textarea>
             menu.style.top = e.pageY + 'px';
         };
 
-        // Bienvenue
         setTimeout(() => showNotification('Bienvenue', 'Kali Linux est opérationnel!'), 1000);
-
     </script>
 </body>
 </html>
