@@ -16,31 +16,32 @@
 
         /* --- ÉCRAN DE LOGIN --- */
         #login-screen {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background: radial-gradient(circle, #1a1a2e 0%, #0a0a0a 100%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
+            z-index: 9999; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: white;
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #login-screen.hidden { opacity: 0; transform: scale(1.2); pointer-events: none; }
 
-        /* --- MATRIX CANVAS --- */
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 red, -2px 0 blue; }
+            25% { text-shadow: -2px 0 red, 2px 0 blue; }
+            50% { text-shadow: 2px 0 blue, -2px 0 red; }
+            100% { text-shadow: 2px 0 red, -2px 0 blue; }
+        }
+        .login-logo { font-size: 80px; margin-bottom: 20px; animation: glitch 0.2s infinite; cursor: default; }
+
+        /* --- MATRIX BACKGROUND --- */
         #matrix-canvas {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0; opacity: 0.15; pointer-events: none;
         }
 
         .desktop {
             height: calc(100vh - 40px);
-            position: relative;
-            z-index: 1;
-            background: rgba(26, 26, 46, 0.5); /* Semi-transparent pour voir Matrix */
+            position: relative; z-index: 1;
+            background: rgba(26, 26, 46, 0.5);
         }
 
         /* --- TASKBAR & MENUS --- */
@@ -50,10 +51,10 @@
             display: flex; align-items: center; padding: 0 10px; z-index: 1000;
         }
 
-        .app-menu {
-            background: #367bf0; color: white; padding: 8px 15px;
+        .app-menu-btn {
+            background: #367bf0; color: white; padding: 6px 12px;
             border-radius: 4px; cursor: pointer; font-weight: bold;
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 8px; font-size: 14px;
         }
 
         .menu-panel {
@@ -63,7 +64,7 @@
         }
         .menu-panel.active { display: block; }
         .menu-category { color: #367bf0; font-weight: bold; margin: 10px 0 5px 0; font-size: 11px; text-transform: uppercase; }
-        .menu-item { padding: 8px; color: white; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; }
+        .menu-item { padding: 8px; color: white; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; font-size: 14px; }
         .menu-item:hover { background: #367bf0; }
 
         /* --- FENÊTRES --- */
@@ -73,62 +74,72 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden;
         }
         .window.active { display: flex; z-index: 100; }
-        .window.maximized { left: 0 !important; top: 0 !important; width: 100% !important; height: calc(100vh - 40px) !important; border-radius: 0; }
-        
         .window-header {
             background: #1a1a2e; padding: 10px; border-bottom: 1px solid #367bf0;
             display: flex; justify-content: space-between; align-items: center; cursor: move;
         }
+        .window-title { color: white; font-size: 13px; font-weight: bold; pointer-events: none; }
         .window-controls { display: flex; gap: 8px; }
-        .window-control { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; }
+        .window-control { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
         .close { background: #ff6b6b; }
         .maximize { background: #50c878; }
         .minimize { background: #f4c430; }
-
         .window-content { flex: 1; padding: 15px; color: #fff; overflow: auto; background: #1e1e2e; }
 
         /* --- ICONS --- */
         .desktop-icon {
-            width: 80px; padding: 10px; text-align: center; color: white;
-            cursor: pointer; border-radius: 6px; position: absolute;
+            width: 85px; padding: 10px; text-align: center; color: white;
+            cursor: pointer; border-radius: 6px; position: absolute; transition: 0.2s;
+            z-index: 2;
         }
         .desktop-icon:hover { background: rgba(54, 123, 240, 0.2); }
-        .desktop-icon .icon { font-size: 40px; margin-bottom: 5px; }
+        .desktop-icon .icon { font-size: 38px; margin-bottom: 5px; }
         .desktop-icon .label { font-size: 11px; text-shadow: 1px 1px 2px #000; }
 
-        /* --- ELEMENTS SPECIFIQUES --- */
-        .terminal { background: #0a0a0a; font-family: 'Courier New', monospace; height: 100%; padding: 10px; }
-        .terminal-line { color: #0f0; margin: 2px 0; }
+        /* --- TERMINAL --- */
+        .terminal { background: #0a0a0a; font-family: 'Courier New', monospace; height: 100%; padding: 10px; font-size: 14px; }
+        .terminal-line { color: #0f0; margin: 2px 0; white-space: pre-wrap; }
         .terminal-input { background: none; border: none; color: #0f0; outline: none; width: 70%; font-family: inherit; }
-        
-        .progress-bar { background: #2a2a3e; height: 15px; border-radius: 10px; overflow: hidden; margin: 5px 0; }
+
+        /* --- PROGRESS BARS --- */
+        .progress-bar { background: #2a2a3e; height: 12px; border-radius: 6px; overflow: hidden; margin: 5px 0; }
         .progress-fill { background: #367bf0; height: 100%; transition: width 0.5s; }
 
-        .calc-btn { background: #367bf0; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; }
+        /* --- BOUTONS --- */
+        .calc-btn { background: #367bf0; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-size: 13px; }
         .calc-btn:hover { background: #2868d8; }
+        .calc-btn:disabled { background: #444; }
 
+        /* --- NOTIFICATIONS --- */
         .notification {
             position: fixed; top: 20px; right: 20px; background: #1a1a2e; border: 1px solid #367bf0;
             padding: 15px; border-radius: 8px; color: white; z-index: 10000; animation: slideIn 0.3s;
         }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
+        /* --- CONTEXT MENU --- */
         #context-menu {
             position: absolute; background: #1a1a2e; border: 1px solid #367bf0;
-            display: none; z-index: 3000; padding: 5px 0; border-radius: 4px;
+            display: none; z-index: 3000; padding: 5px 0; border-radius: 4px; min-width: 150px;
         }
-        .context-item { padding: 8px 20px; color: white; cursor: pointer; font-size: 13px; }
+        .context-item { padding: 8px 15px; color: white; cursor: pointer; font-size: 13px; }
         .context-item:hover { background: #367bf0; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div style="font-size: 70px; margin-bottom: 20px;">🐉</div>
-        <h2 style="margin-bottom: 20px; letter-spacing: 3px;">KALI LINUX</h2>
-        <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 10px; width: 300px; text-align: center; border: 1px solid rgba(54, 123, 240, 0.3);">
-            <p style="font-size: 12px; color: #367bf0; margin-bottom: 10px;">SESSION DE CHARLES ARSENAULT</p>
-            <button class="calc-btn" style="width: 100%;" onclick="unlockSystem()">ENTRER</button>
+        <div class="login-logo">🐉</div>
+        <h2 style="margin-bottom: 20px; letter-spacing: 5px;">KALI LINUX</h2>
+        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 12px; width: 320px; text-align: center; border: 1px solid rgba(54, 123, 240, 0.3);">
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 11px; color: #367bf0; text-transform: uppercase; margin-bottom: 5px;">Utilisateur</div>
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">Charles Arsenault</div>
+                <input type="password" id="login-pass" placeholder="HTP" 
+                    style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #367bf0; color: white; border-radius: 4px; outline: none; text-align: center;">
+            </div>
+            <button class="calc-btn" style="width: 100%; padding: 12px;" onclick="unlockSystem()">SE CONNECTER</button>
+            <div id="login-error" style="color: #ff6b6b; font-size: 12px; margin-top: 10px; display: none;">Mot de passe incorrect</div>
         </div>
     </div>
 
@@ -138,38 +149,42 @@
         <div class="desktop-icon" style="top: 20px; left: 20px;" data-app="terminal">
             <div class="icon">💻</div><div class="label">Terminal</div>
         </div>
-        <div class="desktop-icon" style="top: 130px; left: 20px;" data-app="cv">
+        <div class="desktop-icon" style="top: 120px; left: 20px;" data-app="cv">
             <div class="icon">👤</div><div class="label">Mon CV</div>
         </div>
-        <div class="desktop-icon" style="top: 240px; left: 20px;" data-app="editor">
+        <div class="desktop-icon" style="top: 220px; left: 20px;" data-app="editor">
             <div class="icon">📝</div><div class="label">Éditeur</div>
         </div>
-        <div class="desktop-icon" style="top: 20px; right: 20px;" data-app="scanner">
-            <div class="icon">📡</div><div class="label">Scanner</div>
-        </div>
-        <div class="desktop-icon" style="top: 130px; right: 20px;" data-app="monitor">
-            <div class="icon">📊</div><div class="label">Moniteur</div>
-        </div>
-        <div class="desktop-icon" style="top: 240px; right: 20px;" data-app="passgen">
-            <div class="icon">🔑</div><div class="label">PassGen</div>
-        </div>
-        <div class="desktop-icon" style="top: 350px; right: 20px;" data-app="calc">
-            <div class="icon">🔢</div><div class="label">Calc</div>
+        <div class="desktop-icon" style="top: 320px; left: 20px;" data-app="sniffer">
+            <div class="icon">🔍</div><div class="label">Wireshark</div>
         </div>
 
-        <div class="window" id="terminal-window" style="left: 100px; top: 100px; width: 650px; height: 400px;">
+        <div class="desktop-icon" style="top: 20px; right: 20px;" data-app="scanner">
+            <div class="icon">📡</div><div class="label">NetScanner</div>
+        </div>
+        <div class="desktop-icon" style="top: 120px; right: 20px;" data-app="monitor">
+            <div class="icon">📊</div><div class="label">Moniteur</div>
+        </div>
+        <div class="desktop-icon" style="top: 220px; right: 20px;" data-app="passgen">
+            <div class="icon">🔑</div><div class="label">PassGen</div>
+        </div>
+        <div class="desktop-icon" style="top: 320px; right: 20px;" data-app="calc">
+            <div class="icon">🔢</div><div class="label">Calculatrice</div>
+        </div>
+
+        <div class="window" id="terminal-window" style="left: 100px; top: 100px; width: 600px; height: 400px;">
             <div class="window-header">
-                <div class="window-title">🐉 Terminal - Kali Linux</div>
+                <div class="window-title">🐉 Terminal</div>
                 <div class="window-controls"><div class="window-control close" data-window="terminal-window"></div></div>
             </div>
             <div class="window-content terminal" id="terminal">
-                <div class="terminal-line">Kali GNU/Linux 2024.1 LTS</div>
+                <div class="terminal-line">Kali GNU/Linux 2024.1 LTS - Session: charles@kali</div>
                 <div class="terminal-line">Tapez 'help' pour les commandes.</div>
-                <div class="terminal-line"><span class="terminal-prompt">kali@kali:~$</span> <input type="text" class="terminal-input" id="terminal-input" autofocus></div>
+                <div class="terminal-line" id="input-line"><span style="color:#367bf0">kali@kali:~$</span> <input type="text" class="terminal-input" id="terminal-input" autofocus></div>
             </div>
         </div>
 
-        <div class="window" id="cv-window" style="left: 200px; top: 50px; width: 600px; height: 500px;">
+        <div class="window" id="cv-window" style="left: 150px; top: 50px; width: 600px; height: 500px;">
             <div class="window-header">
                 <div class="window-title">📄 CV_Charles_Arsenault.sh</div>
                 <div class="window-controls"><div class="window-control close" data-window="cv-window"></div></div>
@@ -177,38 +192,63 @@
             <div class="window-content" style="background: #0d0d0d; font-family: monospace;">
                 <div style="border: 1px dashed #367bf0; padding: 20px;">
                     <h2 style="color: #367bf0; text-align: center;">CHARLES ARSENAULT</h2>
-                    <p style="text-align: center; margin-bottom: 15px;">873-661-1113 | Sherbrooke, QC</p>
-                    <h4 style="color: #367bf0;">> ÉTUDES</h4>
+                    <p style="text-align: center; font-size: 12px; margin-bottom: 20px;">Sherbrooke, QC | 873-661-1113</p>
+                    <h4 style="color: #367bf0;">> PARCOURS</h4>
                     <p>Soutien informatique - CFP EXPÉ Magog (2024-2026)</p>
-                    <h4 style="color: #367bf0; margin-top: 15px;">> EXPERTISES</h4>
-                    <p>Windows, Linux, Réseautique, Virtualisation</p>
-                    <button class="calc-btn" style="display: block; margin: 20px auto;" onclick="downloadCV()">./download_pdf.sh</button>
+                    <h4 style="color: #367bf0; margin-top: 15px;">> COMPÉTENCES</h4>
+                    <p>• Windows/Linux Admin<br>• Réseautique & Sécurité<br>• Virtualisation</p>
+                    <button class="calc-btn" style="display: block; margin: 30px auto;" onclick="downloadCV()">./download_pdf.sh</button>
                 </div>
             </div>
         </div>
 
-        <div class="window" id="monitor-window" style="left: 400px; top: 80px; width: 350px; height: 250px;">
+        <div class="window" id="sniffer-window" style="left: 400px; top: 100px; width: 500px; height: 300px;">
             <div class="window-header">
-                <div class="window-title">📊 Moniteur Système</div>
-                <div class="window-controls"><div class="window-control close" data-window="monitor-window"></div></div>
+                <div class="window-title">🔍 Wireshark Simulator</div>
+                <div class="window-controls"><div class="window-control close" data-window="sniffer-window"></div></div>
             </div>
-            <div class="window-content">
-                <span>CPU: <span id="cpu-text">24%</span></span>
-                <div class="progress-bar"><div class="progress-fill" id="cpu-fill" style="width: 24%"></div></div>
-                <br>
-                <span>RAM: <span id="ram-text">45%</span></span>
-                <div class="progress-bar"><div class="progress-fill" id="ram-fill" style="width: 45%; background: #50c878;"></div></div>
+            <div class="window-content" style="background: #000; color: #00ff41; font-family: monospace; font-size: 11px;">
+                <div id="packet-list">Capturing on eth0...</div>
             </div>
         </div>
 
-        <div class="window" id="scanner-window" style="left: 350px; top: 150px; width: 450px; height: 350px;">
+        <div class="window" id="monitor-window" style="left: 450px; top: 80px; width: 300px; height: 220px;">
             <div class="window-header">
-                <div class="window-title">📡 Network Scanner</div>
+                <div class="window-title">📊 System Monitor</div>
+                <div class="window-controls"><div class="window-control close" data-window="monitor-window"></div></div>
+            </div>
+            <div class="window-content">
+                <p>CPU: <span id="cpu-val">12%</span></p>
+                <div class="progress-bar"><div class="progress-fill" id="cpu-fill" style="width: 12%"></div></div>
+                <p style="margin-top: 15px;">RAM: <span id="ram-val">42%</span></p>
+                <div class="progress-bar"><div class="progress-fill" id="ram-fill" style="width: 42%; background: #50c878;"></div></div>
+            </div>
+        </div>
+
+        <div class="window" id="calc-window" style="left: 600px; top: 100px; width: 260px; height: 360px;">
+            <div class="window-header">
+                <div class="window-title">🔢 Calculatrice</div>
+                <div class="window-controls"><div class="window-control close" data-window="calc-window"></div></div>
+            </div>
+            <div class="window-content">
+                <div id="calc-display" style="background: #000; padding: 15px; text-align: right; font-size: 24px; margin-bottom: 10px; border-radius: 4px;">0</div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
+                    <button class="calc-btn" onclick="pressCalc('7')">7</button><button class="calc-btn" onclick="pressCalc('8')">8</button><button class="calc-btn" onclick="pressCalc('9')">9</button><button class="calc-btn" onclick="pressCalc('/')">/</button>
+                    <button class="calc-btn" onclick="pressCalc('4')">4</button><button class="calc-btn" onclick="pressCalc('5')">5</button><button class="calc-btn" onclick="pressCalc('6')">6</button><button class="calc-btn" onclick="pressCalc('*')">*</button>
+                    <button class="calc-btn" onclick="pressCalc('1')">1</button><button class="calc-btn" onclick="pressCalc('2')">2</button><button class="calc-btn" onclick="pressCalc('3')">3</button><button class="calc-btn" onclick="pressCalc('-')">-</button>
+                    <button class="calc-btn" onclick="pressCalc('0')">0</button><button class="calc-btn" onclick="pressCalc('C')">C</button><button class="calc-btn" onclick="pressCalc('=')" style="grid-column: span 2;">=</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="window" id="scanner-window" style="left: 300px; top: 150px; width: 450px; height: 350px;">
+            <div class="window-header">
+                <div class="window-title">📡 Nmap Scanner</div>
                 <div class="window-controls"><div class="window-control close" data-window="scanner-window"></div></div>
             </div>
             <div class="window-content">
-                <div id="scan-res" style="background: #000; height: 180px; padding: 10px; font-family: monospace; color: #0f0; font-size: 12px; overflow-y: auto;">Prêt...</div>
-                <button class="calc-btn" id="scan-btn" style="width: 100%; margin-top: 15px;" onclick="startScan()">SCANNER LE RÉSEAU</button>
+                <div id="scan-res" style="background: #000; height: 180px; padding: 10px; font-family: monospace; color: #0f0; font-size: 12px; overflow-y: auto; border-radius: 4px;">Prêt...</div>
+                <button class="calc-btn" id="scan-btn" style="width: 100%; margin-top: 15px;" onclick="runScan()">SCANNER LE RÉSEAU</button>
             </div>
         </div>
 
@@ -218,204 +258,165 @@
                 <div class="window-controls"><div class="window-control close" data-window="passgen-window"></div></div>
             </div>
             <div class="window-content" style="text-align: center;">
-                <div id="pass-out" style="padding: 10px; background: #000; color: #50c878; margin-bottom: 15px; border: 1px solid #367bf0;">**********</div>
-                <button class="calc-btn" onclick="genPass()">GÉNÉRER</button>
+                <div id="pass-out" style="padding: 15px; background: #000; color: #50c878; margin-bottom: 15px; border: 1px solid #367bf0; font-family: monospace;">**********</div>
+                <button class="calc-btn" style="width: 100%;" onclick="generatePass()">GÉNÉRER</button>
             </div>
         </div>
 
-        <div class="window" id="calc-window" style="left: 600px; top: 100px; width: 280px; height: 380px;">
-            <div class="window-header">
-                <div class="window-title">🔢 Calc</div>
-                <div class="window-controls"><div class="window-control close" data-window="calc-window"></div></div>
-            </div>
-            <div class="window-content">
-                <div id="calc-display" style="background: #000; padding: 15px; text-align: right; font-size: 24px; margin-bottom: 10px;">0</div>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
-                    <button class="calc-btn" onclick="calc('7')">7</button><button class="calc-btn" onclick="calc('8')">8</button><button class="calc-btn" onclick="calc('9')">9</button><button class="calc-btn" onclick="calc('/')">/</button>
-                    <button class="calc-btn" onclick="calc('4')">4</button><button class="calc-btn" onclick="calc('5')">5</button><button class="calc-btn" onclick="calc('6')">6</button><button class="calc-btn" onclick="calc('*')">*</button>
-                    <button class="calc-btn" onclick="calc('1')">1</button><button class="calc-btn" onclick="calc('2')">2</button><button class="calc-btn" onclick="calc('3')">3</button><button class="calc-btn" onclick="calc('-')">-</button>
-                    <button class="calc-btn" onclick="calc('0')">0</button><button class="calc-btn" onclick="calc('=')" style="grid-column: span 2;">=</button><button class="calc-btn" onclick="calc('C')">C</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="window" id="editor-window" style="left: 150px; top: 200px; width: 500px; height: 350px;">
+        <div class="window" id="editor-window" style="left: 150px; top: 150px; width: 450px; height: 300px;">
             <div class="window-header">
                 <div class="window-title">📝 Mousepad</div>
                 <div class="window-controls"><div class="window-control close" data-window="editor-window"></div></div>
             </div>
             <div class="window-content" style="padding: 0;">
-                <textarea style="width: 100%; height: 100%; background: #1a1a2e; color: #fff; border: none; padding: 10px; outline: none; resize: none;"></textarea>
+                <textarea style="width: 100%; height: 100%; background: #1a1a2e; color: #fff; border: none; padding: 10px; outline: none; resize: none; font-family: monospace;">Charles Arsenault - Portfolio</textarea>
             </div>
         </div>
-
     </div>
 
     <div id="context-menu">
-        <div class="context-item" onclick="openWindow('terminal-window')">Ouvrir Terminal</div>
+        <div class="context-item" onclick="openWindow('terminal-window')">Terminal</div>
         <div class="context-item" onclick="location.reload()">Rafraîchir</div>
     </div>
 
     <div class="taskbar">
-        <div class="app-menu" id="menu-btn"><span>🐉</span> Applications</div>
+        <div class="app-menu-btn" id="menu-btn"><span>🐉</span> Menu</div>
         <div style="flex: 1;"></div>
-        <div style="color: white; font-size: 13px; margin-right: 15px;" id="clock">00:00</div>
+        <div style="color: white; font-size: 13px; font-weight: bold;" id="clock">00:00</div>
     </div>
 
     <div class="menu-panel" id="app-menu">
-        <div class="menu-category">Favoris</div>
-        <div class="menu-item" onclick="openWindow('terminal-window')">💻 Terminal</div>
-        <div class="menu-item" onclick="openWindow('cv-window')">👤 Mon CV</div>
-        <div class="menu-category">Outils Kali</div>
-        <div class="menu-item" onclick="openWindow('scanner-window')">📡 NetScanner</div>
-        <div class="menu-item" onclick="openWindow('passgen-window')">🔑 PassGen</div>
         <div class="menu-category">Système</div>
-        <div class="menu-item" onclick="location.reload()">🔄 Redémarrer</div>
+        <div class="menu-item" onclick="openWindow('terminal-window')">💻 Terminal</div>
+        <div class="menu-item" onclick="openWindow('monitor-window')">📊 Moniteur</div>
+        <div class="menu-category">Outils</div>
+        <div class="menu-item" onclick="openWindow('scanner-window')">📡 NetScanner</div>
+        <div class="menu-item" onclick="openWindow('sniffer-window')">🔍 Wireshark</div>
+        <div class="menu-item" onclick="openWindow('passgen-window')">🔑 PassGen</div>
     </div>
 
     <script>
         let zIndex = 100;
         let calcVal = "0";
 
-        // --- LOGIN ---
+        // --- LOGIN LOGIC ---
         function unlockSystem() {
-            document.getElementById('login-screen').classList.add('hidden');
-            showNotification('Système', 'Bienvenue Charles Arsenault.');
+            const pass = document.getElementById('login-pass');
+            if (pass.value.toLowerCase() === "kali" || pass.value === "") {
+                document.getElementById('login-screen').classList.add('hidden');
+                setTimeout(() => showNotification('Système', 'Accès autorisé.'), 1000);
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+                pass.style.borderColor = 'red';
+            }
         }
-
-        // --- CLOCK ---
-        function updateClock() {
-            const d = new Date();
-            document.getElementById('clock').textContent = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
-        }
-        setInterval(updateClock, 1000); updateClock();
+        document.getElementById('login-pass').addEventListener('keypress', (e) => { if(e.key === 'Enter') unlockSystem(); });
 
         // --- MATRIX ---
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
         const drops = Array(Math.floor(canvas.width / 16)).fill(1);
         function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,canvas.width,canvas.height);
             ctx.fillStyle = "#0F0"; ctx.font = "16px monospace";
             drops.forEach((y, i) => {
-                const text = letters[Math.floor(Math.random() * letters.length)];
-                ctx.fillText(text, i * 16, y * 16);
-                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                ctx.fillText(String.fromCharCode(Math.random()*128), i*16, y*16);
+                if(y*16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             });
         }
         setInterval(drawMatrix, 35);
 
-        // --- FENÊTRES ---
+        // --- WINDOWS ---
         function openWindow(id) {
-            const win = document.getElementById(id);
-            win.style.display = 'flex'; win.style.zIndex = ++zIndex;
+            const win = document.getElementById(id); win.style.display = 'flex'; win.style.zIndex = ++zIndex;
+            if(id === 'sniffer-window') startSniffer();
         }
+        document.querySelectorAll('.desktop-icon').forEach(i => i.onclick = () => openWindow(i.dataset.app + '-window'));
+        document.querySelectorAll('.close').forEach(b => b.onclick = () => document.getElementById(b.dataset.window).style.display = 'none');
 
-        document.querySelectorAll('.desktop-icon').forEach(icon => {
-            icon.onclick = () => openWindow(icon.dataset.app + '-window');
-        });
-
-        document.querySelectorAll('.close').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); document.getElementById(btn.dataset.window).style.display = 'none'; };
-        });
-
-        // --- DRAG AND DROP ---
-        document.querySelectorAll('.window-header').forEach(header => {
-            header.onmousedown = (e) => {
-                const win = header.parentElement; win.style.zIndex = ++zIndex;
-                let x = e.clientX - win.offsetLeft; let y = e.clientY - win.offsetTop;
-                document.onmousemove = (e) => {
-                    win.style.left = e.clientX - x + 'px';
-                    win.style.top = e.clientY - y + 'px';
-                };
+        // DRAG
+        document.querySelectorAll('.window-header').forEach(h => {
+            h.onmousedown = (e) => {
+                const w = h.parentElement; w.style.zIndex = ++zIndex;
+                let ox = e.clientX - w.offsetLeft, oy = e.clientY - w.offsetTop;
+                document.onmousemove = (ev) => { w.style.left = ev.clientX-ox+'px'; w.style.top = ev.clientY-oy+'px'; };
                 document.onmouseup = () => document.onmousemove = null;
-            };
+            }
         });
 
-        // --- TERMINAL & CV DOWNLOAD (Original) ---
-        const terminalInput = document.getElementById('terminal-input');
+        // --- TERMINAL ---
+        const tInput = document.getElementById('terminal-input');
         const term = document.getElementById('terminal');
-        
-        terminalInput.onkeydown = (e) => {
-            if (e.key === 'Enter') {
-                const cmd = terminalInput.value.toLowerCase().trim();
-                const line = document.createElement('div');
-                line.innerHTML = `<span style="color:#367bf0">kali@kali:~$</span> ${cmd}`;
-                term.insertBefore(line, terminalInput.parentElement);
-                
-                if(cmd === 'help') addTermLine("Commandes: help, clear, whoami, ls, hack");
-                else if(cmd === 'ls') addTermLine("CV_Arsenault.pdf  secrets.txt  projects/");
-                else if(cmd === 'whoami') addTermLine("charles_arsenault");
-                else if(cmd === 'clear') { term.innerHTML = ''; term.appendChild(terminalInput.parentElement); }
-                
-                terminalInput.value = '';
-                term.scrollTop = term.scrollHeight;
+        tInput.onkeydown = (e) => {
+            if(e.key === 'Enter') {
+                const cmd = tInput.value.toLowerCase().trim();
+                const l = document.createElement('div'); l.innerHTML = `<span style="color:#367bf0">kali@kali:~$</span> ${cmd}`;
+                term.insertBefore(l, document.getElementById('input-line'));
+                if(cmd === 'help') addL("ls, clear, whoami, help");
+                else if(cmd === 'ls') addL("CV.pdf  passwords.txt  projects/");
+                else if(cmd === 'clear') { term.innerHTML = ''; term.appendChild(document.getElementById('input-line')); }
+                tInput.value = ''; term.scrollTop = term.scrollHeight;
             }
         };
-
-        function addTermLine(txt) {
-            const d = document.createElement('div'); d.textContent = txt; d.className = 'terminal-line';
-            term.insertBefore(d, terminalInput.parentElement);
-        }
+        function addL(t) { const d = document.createElement('div'); d.className='terminal-line'; d.textContent=t; term.insertBefore(d, document.getElementById('input-line')); }
 
         function downloadCV() {
-            document.getElementById('cv-window').style.display = 'none';
-            openWindow('terminal-window');
-            const lines = ["Connecting...", "Authenticating...", "Downloading CV_Arsenault.pdf...", "DONE: Saved to /home/kali/Desktop/"];
-            lines.forEach((l, i) => {
+            document.getElementById('cv-window').style.display = 'none'; openWindow('terminal-window');
+            ["Connexion...", "Téléchargement...", "Terminé: CV_Charles_Arsenault.pdf"].forEach((txt, i) => {
                 setTimeout(() => {
-                    const div = document.createElement('div'); div.className = 'terminal-line';
-                    div.textContent = "> " + l; if(i === 3) div.style.color = "#50c878";
-                    term.insertBefore(div, terminalInput.parentElement);
-                }, i * 600);
+                    const d = document.createElement('div'); d.className='terminal-line'; d.textContent="> " + txt;
+                    if(i===2) d.style.color="#50c878"; term.insertBefore(d, document.getElementById('input-line'));
+                }, i*700);
             });
         }
 
         // --- SCANNER ---
-        function startScan() {
-            const btn = document.getElementById('scan-btn'); const res = document.getElementById('scan-res');
-            btn.disabled = true; res.innerHTML = "Initialisation nmap...";
-            const steps = ["Scanning 192.168.1.1...", "Port 80: Open", "Scanning 192.168.1.15...", "Port 22: Open", "Scan complete."];
-            steps.forEach((s, i) => setTimeout(() => { 
-                res.innerHTML += "<br>> " + s; res.scrollTop = res.scrollHeight;
-                if(i === 4) btn.disabled = false;
-            }, (i+1)*800));
+        function runScan() {
+            const btn = document.getElementById('scan-btn'), res = document.getElementById('scan-res');
+            btn.disabled = true; res.innerHTML = "Initialisation...";
+            ["Scan 192.168.1.1...", "Port 80: Open", "Scan 192.168.1.15...", "Port 22: Open", "Terminé."].forEach((s, i) => {
+                setTimeout(() => { res.innerHTML += "<br>> " + s; if(i===4) btn.disabled = false; }, i*800);
+            });
         }
 
-        // --- UTILS (Calc, Pass, Monitor) ---
-        function calc(v) {
-            const disp = document.getElementById('calc-display');
-            if(v === 'C') calcVal = "0";
-            else if(v === '=') try { calcVal = eval(calcVal).toString(); } catch { calcVal = "Error"; }
+        // --- WIRESHARK ---
+        let snif = false;
+        function startSniffer() {
+            if(snif) return; snif = true; const l = document.getElementById('packet-list');
+            setInterval(() => {
+                if(document.getElementById('sniffer-window').style.display === 'flex') {
+                    const d = document.createElement('div');
+                    d.innerHTML = `[${new Date().toLocaleTimeString()}] 192.168.1.${Math.floor(Math.random()*10)} -> 8.8.8.8 TCP LEN:64`;
+                    l.appendChild(d); if(l.childNodes.length > 12) l.removeChild(l.firstChild);
+                }
+            }, 1500);
+        }
+
+        // --- UTILS ---
+        function pressCalc(v) {
+            const d = document.getElementById('calc-display');
+            if(v==='C') calcVal = "0"; else if(v==='=') calcVal = eval(calcVal).toString();
             else calcVal = calcVal === "0" ? v : calcVal + v;
-            disp.textContent = calcVal;
+            d.textContent = calcVal;
         }
 
-        function genPass() { document.getElementById('pass-out').textContent = Math.random().toString(36).slice(-10) + "!"; }
-
-        function updateMonitor() {
-            const cpu = Math.floor(Math.random()*20 + 10);
-            document.getElementById('cpu-fill').style.width = cpu + "%";
-            document.getElementById('cpu-text').textContent = cpu + "%";
-        }
-        setInterval(updateMonitor, 2000);
+        function generatePass() { document.getElementById('pass-out').textContent = Math.random().toString(36).slice(-10)+"!"; }
 
         function showNotification(t, m) {
-            const n = document.createElement('div'); n.className = 'notification';
-            n.innerHTML = `<b>${t}</b><br>${m}`; document.body.appendChild(n);
-            setTimeout(() => n.remove(), 3000);
+            const n = document.createElement('div'); n.className = 'notification'; n.innerHTML = `<b>${t}</b><br>${m}`;
+            document.body.appendChild(n); setTimeout(() => n.remove(), 3000);
         }
 
-        // --- MENUS ---
+        setInterval(() => {
+            const d = new Date(); document.getElementById('clock').textContent = d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
+            const cpu = Math.floor(Math.random()*20+10); document.getElementById('cpu-fill').style.width = cpu+'%'; document.getElementById('cpu-val').textContent = cpu+'%';
+        }, 1000);
+
         document.getElementById('menu-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('app-menu').classList.toggle('active'); };
         document.body.onclick = () => { document.getElementById('app-menu').classList.remove('active'); document.getElementById('context-menu').style.display = 'none'; };
-        document.oncontextmenu = (e) => {
-            e.preventDefault(); const m = document.getElementById('context-menu');
-            m.style.display = 'block'; m.style.left = e.pageX + 'px'; m.style.top = e.pageY + 'px';
-        };
+        document.oncontextmenu = (e) => { e.preventDefault(); const m = document.getElementById('context-menu'); m.style.display='block'; m.style.left=e.pageX+'px'; m.style.top=e.pageY+'px'; };
 
     </script>
 </body>
