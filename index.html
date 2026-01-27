@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carte Chasse Québec - Terres de la Couronne</title>
-    
+
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap"
+        rel="stylesheet">
 
     <!-- Leaflet Search CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.css" />
@@ -21,6 +23,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <div id="app-container">
@@ -30,11 +33,13 @@
                 <h1><i class="fa-solid fa-location-crosshairs"></i> Chasse Québec</h1>
                 <p>Carte Interactive des Terres Publiques</p>
             </div>
-            
+
             <div class="control-group">
                 <h3>Outils</h3>
-                <button id="btn-add-pin" class="btn-primary"><i class="fa-solid fa-thumbtack"></i> Ajouter un Repère</button>
-                <button id="btn-locate" class="btn-secondary"><i class="fa-solid fa-location-arrow"></i> Ma Position</button>
+                <button id="btn-add-pin" class="btn-primary"><i class="fa-solid fa-thumbtack"></i> Ajouter un
+                    Repère</button>
+                <button id="btn-locate" class="btn-secondary"><i class="fa-solid fa-location-arrow"></i> Ma
+                    Position</button>
             </div>
 
             <div class="control-group">
@@ -76,11 +81,22 @@
                 <div class="form-group">
                     <label>Type</label>
                     <select id="pin-type" required>
-                        <option value="animal">Animal (Gibier)</option>
-                        <option value="cache">Cache / Stand</option>
-                        <option value="piste">Piste / Trace</option>
-                        <option value="camp">Campement</option>
-                        <option value="danger">Danger / Zone Interdite</option>
+                        <optgroup label="🦌 Gibier">
+                            <option value="orignal">Orignal</option>
+                            <option value="ours">Ours</option>
+                            <option value="dindon">Dindon Sauvage</option>
+                            <option value="canard">Canard / Sauvagine</option>
+                            <option value="cerf">Cerf de Virginie</option>
+                            <option value="autre_gibier">Autre Gibier</option>
+                        </optgroup>
+                        <optgroup label="🏹 Équipement">
+                            <option value="cache">Cache / Stand</option>
+                            <option value="camp">Campement</option>
+                        </optgroup>
+                        <optgroup label="📍 Autres">
+                            <option value="piste">Piste / Trace</option>
+                            <option value="danger">Danger / Zone Interdite</option>
+                        </optgroup>
                     </select>
                 </div>
                 <div class="form-group">
@@ -93,9 +109,9 @@
     </div>
 
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <!-- Leaflet Search -->
     <script src="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.js"></script>
 
@@ -105,4 +121,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

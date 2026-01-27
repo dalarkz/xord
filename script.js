@@ -23,8 +23,17 @@ let markers = JSON.parse(localStorage.getItem('hunting_markers')) || [];
 let tempMarker = null;
 let userLocationMarker = null;
 
-// Icons setup
-const createIcon = (color) => {
+// Icons setup - Custom images for animals
+const createCustomIcon = (imagePath, size = [40, 40]) => {
+    return L.icon({
+        iconUrl: imagePath,
+        iconSize: size,
+        iconAnchor: [size[0] / 2, size[1]],
+        popupAnchor: [0, -size[1]]
+    });
+};
+
+const createColorIcon = (color) => {
     return new L.Icon({
         iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -36,12 +45,20 @@ const createIcon = (color) => {
 };
 
 const icons = {
-    animal: createIcon('green'),
-    cache: createIcon('orange'),
-    piste: createIcon('yellow'),
-    camp: createIcon('blue'),
-    danger: createIcon('red'),
-    default: createIcon('blue')
+    // Custom animal icons
+    orignal: createCustomIcon('ping_orignal-removebg-preview.png', [45, 45]),
+    ours: createCustomIcon('ping_ours-removebg-preview.png', [45, 45]),
+    dindon: createCustomIcon('ping_dindon-removebg-preview.png', [45, 45]),
+    canard: createCustomIcon('ping_canard-removebg-preview.png', [45, 45]),
+
+    // Generic colored markers for other types
+    cerf: createColorIcon('green'),
+    autre_gibier: createColorIcon('green'),
+    cache: createColorIcon('orange'),
+    piste: createColorIcon('yellow'),
+    camp: createColorIcon('blue'),
+    danger: createColorIcon('red'),
+    default: createColorIcon('blue')
 };
 
 // --- Real Government WMS Layers ---
@@ -67,9 +84,30 @@ const publicLandsLayer = L.tileLayer.wms('https://servicescarto.mffp.gouv.qc.ca/
     opacity: 0.5
 }).addTo(map); // Show by default
 
-// 3. ZEC and Reserves Layer (if available)
+// 3. Terres de la Couronne (Crown Lands) - Official layer
+// This shows the official Crown Lands boundaries
+const crownLandsLayer = L.tileLayer.wms('https://servicescarto.mffp.gouv.qc.ca/pes/services/Territoire/Ter_Pub_Prive/MapServer/WMSServer', {
+    layers: '0,1,2', // Terre publique, Terre privée, Limite
+    format: 'image/png',
+    transparent: true,
+    version: '1.3.0',
+    attribution: '© MFFP Québec',
+    opacity: 0.6
+}).addTo(map); // Show by default
+
+// 4. ZEC and Reserves Layer
 const zecLayer = L.tileLayer.wms('https://servicesvecto3.mern.gouv.qc.ca/geoserver/SmartFaunePub/ows', {
     layers: 'SmartFaunePub:zec_sefaq',
+    format: 'image/png',
+    transparent: true,
+    version: '1.1.0',
+    attribution: '© MERN Québec',
+    opacity: 0.6
+});
+
+// 5. Réserves Fauniques (Wildlife Reserves)
+const reservesLayer = L.tileLayer.wms('https://servicesvecto3.mern.gouv.qc.ca/geoserver/SmartFaunePub/ows', {
+    layers: 'SmartFaunePub:reserve_faunique_sefaq',
     format: 'image/png',
     transparent: true,
     version: '1.1.0',
@@ -80,8 +118,10 @@ const zecLayer = L.tileLayer.wms('https://servicesvecto3.mern.gouv.qc.ca/geoserv
 // Add to Layer Control
 const overlays = {
     "🎯 Zones de Chasse": huntingZonesLayer,
-    "🌲 Terres Publiques": publicLandsLayer,
-    "🏕️ ZEC": zecLayer
+    "👑 Terres de la Couronne": crownLandsLayer,
+    "🌲 Forêts Publiques": publicLandsLayer,
+    "🏕️ ZEC": zecLayer,
+    "🦌 Réserves Fauniques": reservesLayer
 };
 
 L.control.layers(baseMaps, overlays, { collapsed: false }).addTo(map);
