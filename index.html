@@ -14,15 +14,12 @@
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
-
     <!-- Leaflet Search CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.css" />
-
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="app-container">
         <!-- Sidebar / Controls -->
         <div id="sidebar">
@@ -36,7 +33,6 @@
                 <button id="btn-add-pin" class="btn-primary"><i class="fa-solid fa-thumbtack"></i> Ajouter un Repère</button>
                 <button id="btn-locate" class="btn-secondary"><i class="fa-solid fa-location-arrow"></i> Ma Position</button>
             </div>
-
             <div class="control-group">
                 <h3>Légende</h3>
                 <ul class="legend-list">
@@ -45,14 +41,12 @@
                     <li><span class="legend-icon reserve"></span> Réserve Faunique</li>
                 </ul>
             </div>
-
             <div class="control-group">
                 <h3>Mes Repères</h3>
                 <div id="markers-list" class="markers-list">
                     <p class="empty-state">Aucun repère ajouté.</p>
                 </div>
             </div>
-
             <div class="instructions">
                 <h4>Import de Données</h4>
                 <p>Pour ajouter les vraies zones, importez vos fichiers GeoJSON ou KML ici.</p>
@@ -62,11 +56,9 @@
                 <input type="file" id="file-input" accept=".geojson,.json,.kml" hidden>
             </div>
         </div>
-
         <!-- Map Container -->
         <div id="map"></div>
     </div>
-
     <!-- Modal for Adding Pin -->
     <div id="modal-add-pin" class="modal hidden">
         <div class="modal-content">
@@ -91,18 +83,15 @@
             </form>
         </div>
     </div>
-
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <!-- Leaflet Search -->
     <script src="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.js"></script>
-
     <!-- Omniivore for KML/GeoJSON Support (Optional utility often used, 
          but we'll implement native GeoJSON and basic file reader first 
          or include it if complex parsing is needed. Sticking to native for now for simplicity) -->
-
     <script src="script.js"></script>
 </body>
 </html>
