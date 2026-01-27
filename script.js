@@ -19,6 +19,10 @@ const baseMaps = {
 
 // Features & Logic
 let isAddPinMode = false;
+let isMeasureMode = false;
+let measurePoints = [];
+let measureLine = null;
+let measureMarkers = [];
 let markers = JSON.parse(localStorage.getItem('hunting_markers')) || [];
 let tempMarker = null;
 let userLocationMarker = null;
@@ -166,7 +170,19 @@ const loadSavedMarkers = () => {
 const addMarkerToMap = (data) => {
     const icon = icons[data.type] || icons.default;
     const marker = L.marker([data.lat, data.lng], { icon: icon }).addTo(map);
-    marker.bindPopup(`<b>${data.type.toUpperCase()}</b><br>${data.desc}`);
+
+    // Build popup content with optional photo
+    let popupContent = `<b>${data.type.toUpperCase()}</b><br>${data.desc}`;
+    if (data.photo) {
+        popupContent = `
+            <div style="text-align: center;">
+                <img src="${data.photo}" style="max-width: 200px; max-height: 150px; border-radius: 6px; margin-bottom: 8px;">
+                <br><b>${data.type.toUpperCase()}</b><br>${data.desc}
+            </div>
+        `;
+    }
+
+    marker.bindPopup(popupContent);
     return marker;
 };
 
@@ -176,19 +192,113 @@ btnAddPin.addEventListener('click', () => {
     isAddPinMode = !isAddPinMode;
     btnAddPin.classList.toggle('active', isAddPinMode);
     document.getElementById('map').style.cursor = isAddPinMode ? 'crosshair' : '';
+
+    // Disable measure mode if active
+    if (isAddPinMode && isMeasureMode) {
+        isMeasureMode = false;
+        document.getElementById('btn-measure').classList.remove('active');
+        clearMeasurement();
+    }
 });
+
+// 2b. Distance Measurement Tool
+const btnMeasure = document.getElementById('btn-measure');
+btnMeasure.addEventListener('click', () => {
+    isMeasureMode = !isMeasureMode;
+    btnMeasure.classList.toggle('active', isMeasureMode);
+
+    if (!isMeasureMode) {
+        clearMeasurement();
+        document.getElementById('map').style.cursor = '';
+    } else {
+        document.getElementById('map').style.cursor = 'crosshair';
+        // Disable pin mode if active
+        if (isAddPinMode) {
+            isAddPinMode = false;
+            btnAddPin.classList.remove('active');
+        }
+    }
+});
+
+function clearMeasurement() {
+    // Remove line
+    if (measureLine) {
+        map.removeLayer(measureLine);
+        measureLine = null;
+    }
+    // Remove markers
+    measureMarkers.forEach(marker => map.removeLayer(marker));
+    measureMarkers = [];
+    measurePoints = [];
+}
+
+function calculateDistance(latlngs) {
+    let totalDistance = 0;
+    for (let i = 0; i < latlngs.length - 1; i++) {
+        totalDistance += map.distance(latlngs[i], latlngs[i + 1]);
+    }
+    return totalDistance;
+}
+
+function formatDistance(meters) {
+    if (meters < 1000) {
+        return `${Math.round(meters)} m`;
+    } else {
+        return `${(meters / 1000).toFixed(2)} km`;
+    }
+}
 
 // Map Click Event
 map.on('click', (e) => {
-    if (!isAddPinMode) return;
+    // Handle Pin Mode
+    if (isAddPinMode) {
+        const { lat, lng } = e.latlng;
+        document.getElementById('modal-add-pin').classList.remove('hidden');
+        tempMarker = { lat, lng };
+        return;
+    }
 
-    const { lat, lng } = e.latlng;
+    // Handle Measure Mode
+    if (isMeasureMode) {
+        const { lat, lng } = e.latlng;
+        measurePoints.push([lat, lng]);
 
-    // Open Modal
-    document.getElementById('modal-add-pin').classList.remove('hidden');
+        // Add small marker at click point
+        const pointMarker = L.circleMarker([lat, lng], {
+            radius: 5,
+            color: '#e67e22',
+            fillColor: '#e67e22',
+            fillOpacity: 1,
+            weight: 2
+        }).addTo(map);
+        measureMarkers.push(pointMarker);
 
-    // Store temp location
-    tempMarker = { lat, lng };
+        // Draw or update line
+        if (measurePoints.length > 1) {
+            if (measureLine) {
+                map.removeLayer(measureLine);
+            }
+
+            measureLine = L.polyline(measurePoints, {
+                color: '#e67e22',
+                weight: 3,
+                opacity: 0.8,
+                dashArray: '10, 5'
+            }).addTo(map);
+
+            // Calculate and show distance
+            const distance = calculateDistance(measurePoints);
+            const popupContent = `
+                <div style="text-align: center;">
+                    <b>📏 Distance Totale</b><br>
+                    <span style="font-size: 1.2em; color: #e67e22;">${formatDistance(distance)}</span><br>
+                    <small>${measurePoints.length} points</small><br>
+                    <button onclick="clearMeasurement()" style="margin-top: 5px; padding: 3px 8px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer;">Effacer</button>
+                </div>
+            `;
+            measureLine.bindPopup(popupContent).openPopup();
+        }
+    }
 });
 
 // Modal Logic
@@ -196,11 +306,25 @@ document.querySelector('.close-modal').addEventListener('click', () => {
     document.getElementById('modal-add-pin').classList.add('hidden');
 });
 
-document.getElementById('form-add-pin').addEventListener('submit', (e) => {
+// Photo preview handler
+document.getElementById('pin-photo').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            document.getElementById('preview-img').src = event.target.result;
+            document.getElementById('photo-preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+document.getElementById('form-add-pin').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const type = document.getElementById('pin-type').value;
     const desc = document.getElementById('pin-desc').value;
+    const photoInput = document.getElementById('pin-photo');
 
     if (tempMarker) {
         const markerData = {
@@ -211,6 +335,12 @@ document.getElementById('form-add-pin').addEventListener('submit', (e) => {
             desc
         };
 
+        // Handle photo if uploaded
+        if (photoInput.files && photoInput.files[0]) {
+            const compressedPhoto = await compressImage(photoInput.files[0]);
+            markerData.photo = compressedPhoto;
+        }
+
         markers.push(markerData);
         localStorage.setItem('hunting_markers', JSON.stringify(markers));
 
@@ -220,6 +350,7 @@ document.getElementById('form-add-pin').addEventListener('submit', (e) => {
         // Reset
         document.getElementById('modal-add-pin').classList.add('hidden');
         document.getElementById('form-add-pin').reset();
+        document.getElementById('photo-preview').style.display = 'none';
 
         // Disable mode after adding
         isAddPinMode = false;
@@ -227,6 +358,44 @@ document.getElementById('form-add-pin').addEventListener('submit', (e) => {
         document.getElementById('map').style.cursor = '';
     }
 });
+
+// Image compression function
+function compressImage(file, maxWidth = 800, maxHeight = 600, quality = 0.7) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const img = new Image();
+            img.onload = function () {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Calculate new dimensions
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convert to base64 with compression
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
 
 // 3. Update Sidebar List
 function updateMarkersList() {
@@ -310,6 +479,113 @@ map.on('locationfound', (e) => {
 
 map.on('locationerror', (e) => {
     console.log("Geolocation error:", e.message);
+});
+
+// 6. Weather Data
+async function fetchWeather(lat, lon) {
+    // Using Open-Meteo (free, no API key required!)
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m&daily=sunrise,sunset&timezone=America/Toronto`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.current) {
+            displayWeather(data);
+        }
+    } catch (error) {
+        console.error("Weather fetch error:", error);
+        document.getElementById('weather-loading').innerHTML = '<small style="color: #e74c3c;">Météo indisponible</small>';
+    }
+}
+
+function displayWeather(data) {
+    const current = data.current;
+    const daily = data.daily;
+
+    // Temperature
+    document.getElementById('weather-temp').textContent = `${Math.round(current.temperature_2m)}°C`;
+
+    // Weather description and icon
+    const weatherInfo = getWeatherInfo(current.weather_code);
+    document.getElementById('weather-desc').textContent = weatherInfo.desc;
+    document.getElementById('weather-icon').textContent = weatherInfo.icon;
+
+    // Wind
+    const windKmh = Math.round(current.wind_speed_10m * 3.6); // m/s to km/h
+    document.getElementById('weather-wind').textContent = `${windKmh} km/h`;
+
+    // Wind direction
+    const windDir = getWindDirection(current.wind_direction_10m);
+    document.getElementById('weather-wind-dir').textContent = windDir;
+
+    // Sunrise/Sunset
+    const sunrise = new Date(daily.sunrise[0]).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' });
+    const sunset = new Date(daily.sunset[0]).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('weather-sun').textContent = `${sunrise} / ${sunset}`;
+
+    // Show weather data, hide loading
+    document.getElementById('weather-loading').style.display = 'none';
+    document.getElementById('weather-data').style.display = 'block';
+}
+
+function getWeatherInfo(code) {
+    const weatherCodes = {
+        0: { desc: 'Ciel dégagé', icon: '☀️' },
+        1: { desc: 'Principalement dégagé', icon: '🌤️' },
+        2: { desc: 'Partiellement nuageux', icon: '⛅' },
+        3: { desc: 'Couvert', icon: '☁️' },
+        45: { desc: 'Brouillard', icon: '🌫️' },
+        48: { desc: 'Brouillard givrant', icon: '🌫️' },
+        51: { desc: 'Bruine légère', icon: '🌦️' },
+        61: { desc: 'Pluie légère', icon: '🌧️' },
+        63: { desc: 'Pluie modérée', icon: '🌧️' },
+        65: { desc: 'Pluie forte', icon: '⛈️' },
+        71: { desc: 'Neige légère', icon: '🌨️' },
+        73: { desc: 'Neige modérée', icon: '❄️' },
+        75: { desc: 'Neige forte', icon: '❄️' },
+        95: { desc: 'Orage', icon: '⛈️' }
+    };
+    return weatherCodes[code] || { desc: 'Variable', icon: '🌤️' };
+}
+
+function getWindDirection(degrees) {
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+    const index = Math.round(degrees / 45) % 8;
+    return directions[index];
+}
+
+// Fetch weather on location found
+map.on('locationfound', (e) => {
+    // Remove old marker if exists
+    if (userLocationMarker) {
+        map.removeLayer(userLocationMarker);
+    }
+
+    // Add accuracy circle
+    const radius = e.accuracy / 2;
+    L.circle(e.latlng, {
+        radius: radius,
+        color: '#3498db',
+        fillColor: '#3498db',
+        fillOpacity: 0.15,
+        weight: 2
+    }).addTo(map);
+
+    // Add user marker with custom icon
+    userLocationMarker = L.marker(e.latlng, {
+        icon: L.divIcon({
+            className: 'user-location-marker',
+            html: '<div style="background: #3498db; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);"></div>',
+            iconSize: [22, 22],
+            iconAnchor: [11, 11]
+        })
+    }).addTo(map);
+
+    userLocationMarker.bindPopup("📍 Vous êtes ici");
+
+    // Fetch weather for this location
+    fetchWeather(e.latlng.lat, e.latlng.lng);
 });
 
 // Init

@@ -20,6 +20,13 @@
     <!-- Leaflet Search CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.css" />
 
+    <!-- PWA Manifest for Mobile Installation -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a6741">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Chasse QC">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -38,16 +45,51 @@
                 <h3>Outils</h3>
                 <button id="btn-add-pin" class="btn-primary"><i class="fa-solid fa-thumbtack"></i> Ajouter un
                     Repère</button>
+                <button id="btn-measure" class="btn-secondary"><i class="fa-solid fa-ruler"></i> Mesurer
+                    Distance</button>
                 <button id="btn-locate" class="btn-secondary"><i class="fa-solid fa-location-arrow"></i> Ma
                     Position</button>
             </div>
 
             <div class="control-group">
+                <h3>Météo Locale</h3>
+                <div id="weather-widget" style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px;">
+                    <div id="weather-loading" style="text-align: center; color: #888;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Chargement...
+                    </div>
+                    <div id="weather-data" style="display: none;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <div style="font-size: 2em; font-weight: bold;" id="weather-temp">--°C</div>
+                                <div style="font-size: 0.9em; color: #888;" id="weather-desc">--</div>
+                            </div>
+                            <div style="font-size: 3em;" id="weather-icon">☀️</div>
+                        </div>
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>💨 Vent:</span>
+                                <span id="weather-wind">-- km/h</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>🧭 Direction:</span>
+                                <span id="weather-wind-dir">--</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>☀️ Lever/Coucher:</span>
+                                <span id="weather-sun" style="font-size: 0.85em;">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
                 <h3>Légende</h3>
                 <ul class="legend-list">
-                    <li><span class="legend-icon crown-land"></span> Terres de la Couronne (Simulé)</li>
-                    <li><span class="legend-icon zec"></span> ZEC</li>
-                    <li><span class="legend-icon reserve"></span> Réserve Faunique</li>
+                    <li><span class="legend-icon crown-land"></span> Terres de la Couronne (Réel - MFFP)</li>
+                    <li><span class="legend-icon zec"></span> ZEC (Réel - MERN)</li>
+                    <li><span class="legend-icon reserve"></span> Réserves Fauniques (Réel - MERN)</li>
                 </ul>
             </div>
 
@@ -102,6 +144,15 @@
                 <div class="form-group">
                     <label>Description</label>
                     <textarea id="pin-desc" placeholder="Ex: Orignal mâle vu à 18h..." rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Photo (optionnel)</label>
+                    <input type="file" id="pin-photo" accept="image/*"
+                        style="width: 100%; padding: 8px; background: #1a1a1a; color: white; border: 1px solid #444; border-radius: 6px;">
+                    <small style="color: #888; font-size: 0.8em;">Max 1 photo, sera compressée automatiquement</small>
+                    <div id="photo-preview" style="margin-top: 10px; display: none;">
+                        <img id="preview-img" style="max-width: 100%; max-height: 150px; border-radius: 6px;">
+                    </div>
                 </div>
                 <button type="submit" class="btn-submit">Enregistrer</button>
             </form>
