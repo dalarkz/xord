@@ -1,5 +1,5 @@
 // Map Initialization
-const map = L.map('map').setView([52.0, -72.0], 5); // Centered roughly on Quebec
+const map = L.map('map').setView([47.5, -71.0], 7); // Centered on Quebec City area
 
 // Base Layers
 const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -8,21 +8,20 @@ const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
     attribution: 'Tiles &copy; Esri'
 });
 
 const baseMaps = {
     "Carte Routière": osm,
-    "Satellite": satellite
+    "Vue Satellite": satellite
 };
-
-// Layer Control handled later with overlays
-
 
 // Features & Logic
 let isAddPinMode = false;
 let markers = JSON.parse(localStorage.getItem('hunting_markers')) || [];
 let tempMarker = null;
+let userLocationMarker = null;
 
 // Icons setup
 const createIcon = (color) => {
@@ -45,44 +44,74 @@ const icons = {
     default: createIcon('blue')
 };
 
-// Crown Lands Overlay (Simulation)
-// In a real scenario, this would load a massive KML/GeoJSON
-const crownLandsGroup = L.layerGroup().addTo(map);
+// --- Real Government WMS Layers ---
 
-const loadCrownLands = () => {
-    fetch('crown-lands-sample.json')
-        .then(res => res.json())
-        .then(data => {
-            L.geoJSON(data, {
-                style: function (feature) {
-                    switch (feature.properties.type) {
-                        case 'ZEC': return { color: "#e67e22", weight: 2, fillOpacity: 0.3 };
-                        case 'Reserve': return { color: "#3498db", weight: 2, fillOpacity: 0.3 };
-                        default: return { color: "#4a6741", weight: 1, fillOpacity: 0.4 }; // Crown Land
-                    }
-                },
-                onEachFeature: function (feature, layer) {
-                    layer.bindPopup(`<b>${feature.properties.name}</b><br>Type: ${feature.properties.type}`);
-                }
-            }).addTo(crownLandsGroup);
-            layerControl.addOverlay(crownLandsGroup, "Terres de la Couronne (Simulé)");
+// 1. Zones de Chasse (MERN) - Hunting Zone Boundaries
+const huntingZonesLayer = L.tileLayer.wms('https://servicesvecto3.mern.gouv.qc.ca/geoserver/SmartFaunePub/ows', {
+    layers: 'Zone_chasse_da3_sefaq',
+    format: 'image/png',
+    transparent: true,
+    version: '1.1.0',
+    attribution: '© MERN Québec',
+    opacity: 0.7
+}).addTo(map); // Show by default
 
-            // Initialize Search Control
-            const searchControl = new L.Control.Search({
-                layer: crownLandsGroup,
-                propertyName: 'name',
-                marker: false,
-                moveToLocation: function (latlng, title, map) {
-                    map.flyTo(latlng, 10);
-                }
-            });
-            map.addControl(searchControl);
-        })
-        .catch(err => console.error("Error loading GeoJSON:", err));
+// 2. Terres Publiques / Domanialité (MFFP) - Public Crown Lands
+// Using a different WMS endpoint that shows public vs private lands more clearly
+const publicLandsLayer = L.tileLayer.wms('https://servicescarto.mffp.gouv.qc.ca/pes/services/Forets/STF_WMS/MapServer/WMSServer', {
+    layers: '0,1,3,4', // Public provincial, federal forests at different scales
+    format: 'image/png',
+    transparent: true,
+    version: '1.3.0',
+    attribution: '© MFFP Québec',
+    opacity: 0.5
+}).addTo(map); // Show by default
+
+// 3. ZEC and Reserves Layer (if available)
+const zecLayer = L.tileLayer.wms('https://servicesvecto3.mern.gouv.qc.ca/geoserver/SmartFaunePub/ows', {
+    layers: 'SmartFaunePub:zec_sefaq',
+    format: 'image/png',
+    transparent: true,
+    version: '1.1.0',
+    attribution: '© MERN Québec',
+    opacity: 0.6
+});
+
+// Add to Layer Control
+const overlays = {
+    "🎯 Zones de Chasse": huntingZonesLayer,
+    "🌲 Terres Publiques": publicLandsLayer,
+    "🏕️ ZEC": zecLayer
 };
 
-// Call loader
-loadCrownLands();
+L.control.layers(baseMaps, overlays, { collapsed: false }).addTo(map);
+
+// Add a clear visual legend
+const infoBox = L.control({ position: 'bottomright' });
+infoBox.onAdd = function (map) {
+    const div = L.DomUtil.create('div', 'info-legend');
+    div.innerHTML = `
+        <div style="background: rgba(44, 62, 80, 0.95); padding: 12px; border-radius: 8px; color: white; font-size: 0.85em; max-width: 200px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+            <h4 style="margin: 0 0 10px 0; font-size: 1em; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">📍 Légende</h4>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="width:18px; height:18px; background:rgba(74, 103, 65, 0.5); border:1px solid #4a6741; display:inline-block; border-radius:3px;"></span>
+                <span style="font-size:0.8em;">Terres Publiques</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="width:18px; height:18px; background:rgba(230, 126, 34, 0.5); border:2px solid #e67e22; display:inline-block; border-radius:3px;"></span>
+                <span style="font-size:0.8em;">Zones de Chasse</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="width:18px; height:18px; background:rgba(52, 152, 219, 0.5); border:2px solid #3498db; display:inline-block; border-radius:3px;"></span>
+                <span style="font-size:0.8em;">ZEC</span>
+            </div>
+            <hr style="margin:8px 0; border:0; border-top:1px solid rgba(255,255,255,0.2);">
+            <small style="font-size:0.7em; opacity:0.8;">⚠️ Vérifiez la réglementation locale</small>
+        </div>
+    `;
+    return div;
+};
+infoBox.addTo(map);
 
 // --- Functions ---
 
@@ -152,7 +181,7 @@ document.getElementById('form-add-pin').addEventListener('submit', (e) => {
         document.getElementById('modal-add-pin').classList.add('hidden');
         document.getElementById('form-add-pin').reset();
 
-        // Disable mode after adding (optional UX choice, keeps it clean)
+        // Disable mode after adding
         isAddPinMode = false;
         btnAddPin.classList.remove('active');
         document.getElementById('map').style.cursor = '';
@@ -190,10 +219,9 @@ document.getElementById('file-input').addEventListener('change', function (e) {
         try {
             const geojson = JSON.parse(e.target.result);
             const layer = L.geoJSON(geojson, {
-                style: { color: 'purple', weight: 2 } // Custom import style
+                style: { color: 'purple', weight: 2 }
             }).addTo(map);
             map.fitBounds(layer.getBounds());
-            layerControl.addOverlay(layer, file.name);
             alert("Fichier importé avec succès !");
         } catch (err) {
             alert("Erreur lors de la lecture du fichier. Assurez-vous que c'est un GeoJSON valide.");
@@ -203,14 +231,45 @@ document.getElementById('file-input').addEventListener('change', function (e) {
     reader.readAsText(file);
 });
 
-// 5. Geolocation
+// 5. Geolocation - Always show user location
 document.getElementById('btn-locate').addEventListener('click', () => {
-    map.locate({ setView: true, maxZoom: 16 });
+    map.locate({ setView: true, maxZoom: 14 });
 });
 
+// Auto-locate on page load
+map.locate({ setView: false, watch: true, enableHighAccuracy: true });
+
 map.on('locationfound', (e) => {
-    L.circle(e.latlng, e.accuracy).addTo(map);
-    L.marker(e.latlng).addTo(map).bindPopup("Vous êtes ici").openPopup();
+    // Remove old marker if exists
+    if (userLocationMarker) {
+        map.removeLayer(userLocationMarker);
+    }
+
+    // Add accuracy circle
+    const radius = e.accuracy / 2;
+    L.circle(e.latlng, {
+        radius: radius,
+        color: '#3498db',
+        fillColor: '#3498db',
+        fillOpacity: 0.15,
+        weight: 2
+    }).addTo(map);
+
+    // Add user marker with custom icon
+    userLocationMarker = L.marker(e.latlng, {
+        icon: L.divIcon({
+            className: 'user-location-marker',
+            html: '<div style="background: #3498db; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);"></div>',
+            iconSize: [22, 22],
+            iconAnchor: [11, 11]
+        })
+    }).addTo(map);
+
+    userLocationMarker.bindPopup("📍 Vous êtes ici");
+});
+
+map.on('locationerror', (e) => {
+    console.log("Geolocation error:", e.message);
 });
 
 // Init
